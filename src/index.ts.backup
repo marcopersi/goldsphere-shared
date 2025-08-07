@@ -8,8 +8,6 @@
 // Core Types
 export * from './types/products';
 export * from './types/portfolio';
-export * from './types/trading';
-export * from './types/ui';
 
 // Validation Schemas (Zod)
 export * from './validation/product-schemas';
