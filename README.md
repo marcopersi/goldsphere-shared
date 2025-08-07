@@ -1,5 +1,9 @@
 # @goldsphere/shared
 
+[![CI](https://github.com/marcopersi/goldsphere-shared/actions/workflows/ci.yml/badge.svg)](https://github.com/marcopersi/goldsphere-shared/actions/workflows/ci.yml)
+[![Security](https://github.com/marcopersi/goldsphere-shared/actions/workflows/security.yml/badge.svg)](https://github.com/marcopersi/goldsphere-shared/actions/workflows/security.yml)
+[![npm version](https://badge.fury.io/js/%40goldsphere%2Fshared.svg)](https://badge.fury.io/js/%40goldsphere%2Fshared)
+
 Shared types, schemas, and API contracts for the GoldSphere precious metals platform.
 
 ## Overview
@@ -133,6 +137,8 @@ npm run type-check
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix auto-fixable linting issues
 - `npm run type-check` - Run TypeScript type checking
+- `npm run ci` - Run all CI checks locally (lint + type-check + build)
+- `npm run prepack` - Automatically runs before packaging (calls `ci` script)
 
 ## API Documentation
 
