@@ -31,10 +31,23 @@ npm install @goldsphere/shared
 ```
 src/
 ├── contracts/          # API contract definitions (request/response handlers)
+│   ├── product-api.ts  # Product management API contracts
+│   ├── portfolio-api.ts # Portfolio management API contracts
+│   └── auth-api.ts     # Authentication API contracts
 ├── openapi/            # OpenAPI 3.0 specifications
-├── schemas/            # Business logic schemas
+│   ├── products-api.yaml
+│   ├── portfolio-api.yaml
+│   ├── auth-api.yaml
+│   └── trading-api.yaml
 ├── types/              # TypeScript type definitions
+│   ├── products.ts     # Product-related types
+│   ├── portfolio.ts    # Portfolio-related types
+│   ├── auth.ts         # Authentication types
+│   └── common.ts       # Common/shared types
 └── validation/         # Zod validation schemas
+    ├── product-schemas.ts    # Product validation schemas
+    ├── portfolio-schemas.ts  # Portfolio validation schemas
+    └── auth-schemas.ts       # Auth validation schemas
 ```
 
 ## Usage
@@ -43,11 +56,28 @@ src/
 
 ```typescript
 import { Product, ProductRegistrationRequest } from '@goldsphere/shared/types/products';
+import { Position, PortfolioSummary, TransactionCreateRequest } from '@goldsphere/shared/types/portfolio';
 
 const product: Product = {
   id: 'prod_123',
   name: '1 oz Gold Coin',
   // ... other properties
+};
+
+const position: Position = {
+  id: 'pos_123',
+  userId: 'user_456',
+  productId: 'prod_123',
+  purchaseDate: '2024-08-07T10:00:00Z',
+  purchasePrice: 2100.50,
+  marketPrice: 2150.00,
+  quantity: 1,
+  issuingCountry: 'USA',
+  producer: 'US Mint',
+  certifiedProvenance: true,
+  status: 'active',
+  createdAt: '2024-08-07T10:00:00Z',
+  updatedAt: '2024-08-07T10:00:00Z'
 };
 ```
 
@@ -55,13 +85,20 @@ const product: Product = {
 
 ```typescript
 import { ProductSchema, ProductRegistrationRequestSchema } from '@goldsphere/shared/validation/product-schemas';
+import { PositionSchema, TransactionCreateRequestSchema, PortfolioSummarySchema } from '@goldsphere/shared/validation/portfolio-schemas';
 
-// Validate data
+// Validate product data
 const result = ProductSchema.safeParse(productData);
 if (result.success) {
   console.log('Valid product:', result.data);
 } else {
   console.error('Validation errors:', result.error.issues);
+}
+
+// Validate portfolio position
+const positionResult = PositionSchema.safeParse(positionData);
+if (positionResult.success) {
+  console.log('Valid position:', positionResult.data);
 }
 ```
 
@@ -69,13 +106,28 @@ if (result.success) {
 
 ```typescript
 import { ProductApiHandlers, TypedRequest, TypedResponse, UploadedFile } from '@goldsphere/shared/contracts/product-api';
+import { PortfolioApiHandlers } from '@goldsphere/shared/contracts/portfolio-api';
 
-// Implement API handlers with proper typing (using any framework)
-const handlers: ProductApiHandlers = {
+// Implement Product API handlers with proper typing (using any framework)
+const productHandlers: ProductApiHandlers = {
   getProducts: async (req: TypedRequest<never, never, ProductQueryParams>, res: TypedResponse<ProductsResponse>) => {
     // Implementation with full type safety
     // Framework-agnostic - can be used with Express, Fastify, etc.
   }
+};
+
+// Implement Portfolio API handlers
+const portfolioHandlers: PortfolioApiHandlers = {
+  getPositions: async (req, res) => {
+    // Get user's portfolio positions
+  },
+  createPosition: async (req, res) => {
+    // Create a new position
+  },
+  getPortfolioSummary: async (req, res) => {
+    // Get portfolio summary with metal breakdown
+  }
+  // ... other handlers
 };
 ```
 
@@ -147,6 +199,7 @@ The OpenAPI specifications are located in `src/openapi/`:
 - `products-api.yaml` - Products catalog management API
 - `auth-api.yaml` - Authentication and authorization API  
 - `trading-api.yaml` - Trading and transactions API
+- `portfolio-api.yaml` - Portfolio management API (positions, transactions, summaries)
 
 These are static YAML files that can be consumed by:
 - **Server frameworks**: Express + swagger-ui-express, Fastify + fastify-swagger, etc.
