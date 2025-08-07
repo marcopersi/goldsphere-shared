@@ -6,6 +6,8 @@
  */
 export * from './types/products';
 export * from './types/portfolio';
+export * from './types/trading';
+export * from './types/ui';
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
 export * from './contracts/product-api';

@@ -24,6 +24,8 @@ exports.GOLDSPHERE_SHARED_VERSION = exports.z = void 0;
 // Core Types
 __exportStar(require("./types/products"), exports);
 __exportStar(require("./types/portfolio"), exports);
+__exportStar(require("./types/trading"), exports);
+__exportStar(require("./types/ui"), exports);
 // Validation Schemas (Zod)
 __exportStar(require("./validation/product-schemas"), exports);
 __exportStar(require("./validation/portfolio-schemas"), exports);
