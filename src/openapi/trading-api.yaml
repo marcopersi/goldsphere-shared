@@ -1,0 +1,1084 @@
+openapi: 3.0.0
+info:
+  title: GoldSphere Trading API
+  description: API for precious metals trading operations
+  version: 1.0.0
+  contact:
+    name: GoldSphere Trading Team
+    email: trading@goldsphere.vault
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+  - url: https://api.goldsphere.vault
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /orders:
+    get:
+      summary: Get user orders
+      description: Retrieve a paginated list of user's trading orders
+      tags:
+        - Orders
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: Filter by order status
+          required: false
+          schema:
+            type: string
+            enum: [pending, processing, shipped, delivered, cancelled]
+        - name: type
+          in: query
+          description: Filter by order type
+          required: false
+          schema:
+            type: string
+            enum: [buy, sell]
+        - name: dateFrom
+          in: query
+          description: Filter orders from this date
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          description: Filter orders until this date
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create new order
+      description: Place a new buy or sell order for precious metals
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message:
+                    type: string
+                    example: "Order placed successfully"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Insufficient inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/{orderId}:
+    get:
+      summary: Get order by ID
+      description: Retrieve detailed information about a specific order
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: Unique order identifier
+          schema:
+            type: string
+            example: "ord_20240807_001"
+      responses:
+        '200':
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update order
+      description: Update order details (limited to certain statuses)
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: Unique order identifier
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateRequest'
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message:
+                    type: string
+                    example: "Order updated successfully"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be modified in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Cancel order
+      description: Cancel a pending or processing order
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: Unique order identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Order cancelled successfully"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be cancelled in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /quotes:
+    post:
+      summary: Request trading quote
+      description: Get a real-time quote for buying or selling precious metals
+      tags:
+        - Trading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '200':
+          description: Quote generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /prices/live:
+    get:
+      summary: Get live precious metals prices
+      description: Retrieve current spot prices for precious metals
+      tags:
+        - Prices
+      parameters:
+        - name: metals
+          in: query
+          description: Comma-separated list of metals to get prices for
+          required: false
+          schema:
+            type: string
+            example: "gold,silver,platinum"
+        - name: currency
+          in: query
+          description: Currency for price quotes
+          required: false
+          schema:
+            type: string
+            enum: [USD, EUR, GBP, CHF]
+            default: USD
+      responses:
+        '200':
+          description: Current spot prices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prices:
+                    type: object
+                    properties:
+                      gold:
+                        $ref: '#/components/schemas/MetalPrice'
+                      silver:
+                        $ref: '#/components/schemas/MetalPrice'
+                      platinum:
+                        $ref: '#/components/schemas/MetalPrice'
+                      palladium:
+                        $ref: '#/components/schemas/MetalPrice'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2024-08-07T10:30:00Z"
+                  source:
+                    type: string
+                    example: "London Metal Exchange"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /prices/history:
+    get:
+      summary: Get historical price data
+      description: Retrieve historical price data for precious metals
+      tags:
+        - Prices
+      parameters:
+        - name: metal
+          in: query
+          required: true
+          description: Metal type
+          schema:
+            type: string
+            enum: [gold, silver, platinum, palladium]
+        - name: period
+          in: query
+          required: true
+          description: Time period for historical data
+          schema:
+            type: string
+            enum: [1d, 7d, 1m, 3m, 6m, 1y, 5y]
+        - name: currency
+          in: query
+          description: Currency for price quotes
+          required: false
+          schema:
+            type: string
+            enum: [USD, EUR, GBP, CHF]
+            default: USD
+      responses:
+        '200':
+          description: Historical price data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metal:
+                    type: string
+                    example: "gold"
+                  currency:
+                    type: string
+                    example: "USD"
+                  period:
+                    type: string
+                    example: "1m"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        price:
+                          type: number
+                          example: 2100.50
+                        volume:
+                          type: number
+                          example: 1500000
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /portfolio:
+    get:
+      summary: Get user portfolio
+      description: Retrieve user's precious metals portfolio
+      tags:
+        - Portfolio
+      responses:
+        '200':
+          description: User portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /portfolio/positions:
+    get:
+      summary: Get portfolio positions
+      description: Retrieve detailed breakdown of portfolio positions
+      tags:
+        - Portfolio
+      parameters:
+        - name: metal
+          in: query
+          description: Filter by metal type
+          required: false
+          schema:
+            type: string
+            enum: [gold, silver, platinum, palladium]
+      responses:
+        '200':
+          description: Portfolio positions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Position'
+                  summary:
+                    $ref: '#/components/schemas/PortfolioSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Order:
+      type: object
+      required:
+        - id
+        - userId
+        - type
+        - status
+        - items
+        - totalAmount
+        - currency
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: Unique order identifier
+          example: "ord_20240807_001"
+        userId:
+          type: string
+          description: User identifier
+          example: "user_12345"
+        type:
+          type: string
+          enum: [buy, sell]
+          description: Order type
+          example: "buy"
+        status:
+          type: string
+          enum: [pending, processing, shipped, delivered, cancelled]
+          description: Current order status
+          example: "pending"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          description: Items in the order
+        subtotal:
+          type: number
+          description: Subtotal before fees and taxes
+          example: 2100.50
+        fees:
+          type: object
+          properties:
+            processing:
+              type: number
+              example: 25.00
+            shipping:
+              type: number
+              example: 15.00
+            insurance:
+              type: number
+              example: 10.00
+        taxes:
+          type: number
+          description: Tax amount
+          example: 150.75
+        totalAmount:
+          type: number
+          description: Total order amount
+          example: 2301.25
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Order currency
+          example: "USD"
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethod:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [credit_card, bank_transfer, crypto, cash]
+            last4:
+              type: string
+              example: "1234"
+        tracking:
+          type: object
+          properties:
+            carrier:
+              type: string
+              example: "UPS"
+            trackingNumber:
+              type: string
+              example: "1Z999AA1234567890"
+            estimatedDelivery:
+              type: string
+              format: date
+              example: "2024-08-15"
+        notes:
+          type: string
+          description: Order notes or special instructions
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-07T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-08-07T10:30:00Z"
+
+    OrderItem:
+      type: object
+      required:
+        - productId
+        - quantity
+        - unitPrice
+        - totalPrice
+      properties:
+        productId:
+          type: string
+          description: Product identifier
+          example: "prod_1oz_american_eagle_gold_2024"
+        productName:
+          type: string
+          description: Product name
+          example: "1 oz American Eagle Gold Coin 2024"
+        quantity:
+          type: integer
+          minimum: 1
+          description: Quantity ordered
+          example: 2
+        unitPrice:
+          type: number
+          description: Price per unit at time of order
+          example: 2100.50
+        totalPrice:
+          type: number
+          description: Total price for this item
+          example: 4201.00
+        specifications:
+          type: object
+          description: Product specifications at time of order
+
+    OrderRequest:
+      type: object
+      required:
+        - type
+        - items
+        - shippingAddress
+        - paymentMethod
+      properties:
+        type:
+          type: string
+          enum: [buy, sell]
+          description: Order type
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - productId
+              - quantity
+            properties:
+              productId:
+                type: string
+                description: Product identifier
+              quantity:
+                type: integer
+                minimum: 1
+                description: Quantity to order
+          minItems: 1
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethod:
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [credit_card, bank_transfer, crypto, cash]
+            details:
+              type: object
+              description: Payment method specific details
+        notes:
+          type: string
+          maxLength: 500
+          description: Order notes or special instructions
+
+    OrderUpdateRequest:
+      type: object
+      properties:
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        notes:
+          type: string
+          maxLength: 500
+          description: Order notes or special instructions
+
+    QuoteRequest:
+      type: object
+      required:
+        - type
+        - items
+      properties:
+        type:
+          type: string
+          enum: [buy, sell]
+          description: Quote type
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - productId
+              - quantity
+            properties:
+              productId:
+                type: string
+                description: Product identifier
+              quantity:
+                type: integer
+                minimum: 1
+                description: Quantity for quote
+          minItems: 1
+
+    Quote:
+      type: object
+      required:
+        - id
+        - type
+        - items
+        - subtotal
+        - fees
+        - taxes
+        - totalAmount
+        - currency
+        - validUntil
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Quote identifier
+          example: "quote_20240807_001"
+        type:
+          type: string
+          enum: [buy, sell]
+          description: Quote type
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              productName:
+                type: string
+              quantity:
+                type: integer
+              unitPrice:
+                type: number
+              totalPrice:
+                type: number
+        subtotal:
+          type: number
+          description: Subtotal before fees and taxes
+          example: 2100.50
+        fees:
+          type: object
+          properties:
+            processing:
+              type: number
+            shipping:
+              type: number
+            insurance:
+              type: number
+        taxes:
+          type: number
+          description: Tax amount
+          example: 150.75
+        totalAmount:
+          type: number
+          description: Total quote amount
+          example: 2301.25
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Quote currency
+        validUntil:
+          type: string
+          format: date-time
+          description: Quote expiration time
+          example: "2024-08-07T11:30:00Z"
+        marketConditions:
+          type: object
+          properties:
+            spotPrice:
+              type: number
+            premium:
+              type: number
+            volatility:
+              type: string
+              enum: [low, medium, high]
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-07T10:30:00Z"
+
+    MetalPrice:
+      type: object
+      required:
+        - price
+        - currency
+        - unit
+        - change24h
+        - changePercent24h
+      properties:
+        price:
+          type: number
+          description: Current price per troy ounce
+          example: 2100.50
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Price currency
+        unit:
+          type: string
+          description: Price unit
+          example: "troy_ounce"
+        change24h:
+          type: number
+          description: 24-hour price change
+          example: -15.25
+        changePercent24h:
+          type: number
+          description: 24-hour percentage change
+          example: -0.72
+        high24h:
+          type: number
+          description: 24-hour high
+          example: 2125.75
+        low24h:
+          type: number
+          description: 24-hour low
+          example: 2095.00
+        volume24h:
+          type: number
+          description: 24-hour trading volume
+          example: 1500000
+
+    Portfolio:
+      type: object
+      required:
+        - userId
+        - totalValue
+        - currency
+        - positions
+        - performance
+        - lastUpdated
+      properties:
+        userId:
+          type: string
+          description: User identifier
+        totalValue:
+          type: number
+          description: Total portfolio value
+          example: 150000.00
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Portfolio base currency
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        performance:
+          type: object
+          properties:
+            totalReturn:
+              type: number
+              description: Total return amount
+              example: 15000.00
+            totalReturnPercent:
+              type: number
+              description: Total return percentage
+              example: 11.11
+            dayReturn:
+              type: number
+              description: Day return amount
+              example: -500.00
+            dayReturnPercent:
+              type: number
+              description: Day return percentage
+              example: -0.33
+        allocation:
+          type: object
+          description: Asset allocation by metal
+          properties:
+            gold:
+              type: number
+              example: 65.5
+            silver:
+              type: number
+              example: 25.0
+            platinum:
+              type: number
+              example: 7.5
+            palladium:
+              type: number
+              example: 2.0
+        lastUpdated:
+          type: string
+          format: date-time
+          example: "2024-08-07T10:30:00Z"
+
+    Position:
+      type: object
+      required:
+        - productId
+        - quantity
+        - averagePrice
+        - currentValue
+        - unrealizedGainLoss
+      properties:
+        productId:
+          type: string
+          description: Product identifier
+        productName:
+          type: string
+          description: Product name
+        metal:
+          type: string
+          enum: [gold, silver, platinum, palladium]
+          description: Metal type
+        quantity:
+          type: number
+          description: Total quantity held
+          example: 10.5
+        averagePrice:
+          type: number
+          description: Average purchase price
+          example: 2050.00
+        currentPrice:
+          type: number
+          description: Current market price
+          example: 2100.50
+        currentValue:
+          type: number
+          description: Current total value
+          example: 22055.25
+        unrealizedGainLoss:
+          type: number
+          description: Unrealized gain/loss
+          example: 530.25
+        unrealizedGainLossPercent:
+          type: number
+          description: Unrealized gain/loss percentage
+          example: 2.46
+        weight:
+          type: number
+          description: Total weight in grams
+          example: 326.55
+        acquisitionDates:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              quantity:
+                type: number
+              price:
+                type: number
+
+    PortfolioSummary:
+      type: object
+      properties:
+        totalValue:
+          type: number
+          example: 150000.00
+        totalWeight:
+          type: object
+          properties:
+            gold:
+              type: number
+              example: 3110.35
+            silver:
+              type: number
+              example: 15551.75
+            platinum:
+              type: number
+              example: 311.04
+            palladium:
+              type: number
+              example: 155.52
+        totalQuantity:
+          type: object
+          properties:
+            gold:
+              type: number
+              example: 100.0
+            silver:
+              type: number
+              example: 500.0
+            platinum:
+              type: number
+              example: 10.0
+            palladium:
+              type: number
+              example: 5.0
+
+    Address:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - street
+        - city
+        - postalCode
+        - country
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        company:
+          type: string
+          example: "GoldSphere Inc."
+        street:
+          type: string
+          example: "123 Gold Street"
+        street2:
+          type: string
+          example: "Suite 456"
+        city:
+          type: string
+          example: "New York"
+        state:
+          type: string
+          example: "NY"
+        postalCode:
+          type: string
+          example: "10001"
+        country:
+          type: string
+          example: "USA"
+        phone:
+          type: string
+          example: "+1-555-123-4567"
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 150
+        totalPages:
+          type: integer
+          example: 8
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: false
+
+    Error:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Invalid input data"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "quantity"
+                  message:
+                    type: string
+                    example: "Quantity must be greater than 0"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized - invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Orders
+    description: Order management operations
+  - name: Trading
+    description: Trading and quote operations
+  - name: Prices
+    description: Price data and market information
+  - name: Portfolio
+    description: Portfolio management operations
