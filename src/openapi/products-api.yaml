@@ -1,0 +1,717 @@
+openapi: 3.0.0
+info:
+  title: GoldSphere Product Registration API
+  description: API for managing precious metals product catalog
+  version: 1.0.0
+  contact:
+    name: GoldSphere API Team
+    email: api@goldsphere.vault
+
+servers:
+  - url: "{protocol}://{host}:{port}/api"
+    description: Configurable server endpoint
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+        description: The protocol to use (http for dev, https for prod)
+      host:
+        default: localhost
+        description: The server hostname or IP address
+        examples:
+          development: localhost
+          staging: staging-api.goldsphere.vault
+          production: api.goldsphere.vault
+      port:
+        default: "8080"
+        description: The server port number
+        examples:
+          development: "8080"
+          staging: "443"
+          production: "443"
+  - url: https://api.goldsphere.vault/api
+    description: Production server
+  - url: https://staging-api.goldsphere.vault/api
+    description: Staging server
+  - url: http://localhost:8080/api
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /products:
+    get:
+      summary: Get all products
+      description: Retrieve a paginated list of all products in the catalog
+      tags:
+        - Products
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: metal
+          in: query
+          description: Filter by metal type
+          required: false
+          schema:
+            type: string
+            enum: [gold, silver, platinum, palladium]
+        - name: type
+          in: query
+          description: Filter by product type
+          required: false
+          schema:
+            type: string
+            enum: [coin, bar, round]
+        - name: producer
+          in: query
+          description: Filter by producer/mint
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Register new product
+      description: Add a new precious metals product to the catalog
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - product
+                - image
+              properties:
+                product:
+                  $ref: '#/components/schemas/ProductRegistrationRequest'
+                image:
+                  type: string
+                  format: binary
+                  description: Product image file (JPG, PNG, WebP)
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/ProductRegistrationRequest'
+                - type: object
+                  properties:
+                    imageBase64:
+                      type: string
+                      description: Base64 encoded image data
+                      example: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+      responses:
+        '201':
+          description: Product successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  product:
+                    $ref: '#/components/schemas/Product'
+                  message:
+                    type: string
+                    example: "Product registered successfully"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Product already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      description: Retrieve detailed information about a specific product
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Unique product identifier
+          schema:
+            type: string
+            example: "prod_1oz_american_eagle_gold_2024"
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update product
+      description: Update an existing product's information
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Unique product identifier
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                product:
+                  $ref: '#/components/schemas/ProductUpdateRequest'
+                image:
+                  type: string
+                  format: binary
+                  description: New product image (optional)
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  product:
+                    $ref: '#/components/schemas/Product'
+                  message:
+                    type: string
+                    example: "Product updated successfully"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete product
+      description: Remove a product from the catalog
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Unique product identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Product deleted successfully"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /products/bulk:
+    post:
+      summary: Bulk product registration
+      description: Register multiple products at once
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - products
+              properties:
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductRegistrationRequest'
+                  minItems: 1
+                  maxItems: 100
+      responses:
+        '201':
+          description: Bulk registration completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          $ref: '#/components/schemas/Product'
+                        status:
+                          type: string
+                          enum: [success, error]
+                        error:
+                          type: string
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 10
+                      successful:
+                        type: integer
+                        example: 8
+                      failed:
+                        type: integer
+                        example: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - metal
+        - weight
+        - weightUnit
+        - purity
+        - price
+        - currency
+        - producer
+        - imageUrl
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: Unique product identifier
+          example: "prod_1oz_american_eagle_gold_2024"
+        name:
+          type: string
+          description: Product display name
+          example: "1 oz American Eagle Gold Coin 2024"
+        type:
+          type: string
+          enum: [coin, bar, round]
+          description: Type of precious metals product
+          example: "coin"
+        metal:
+          type: string
+          enum: [gold, silver, platinum, palladium]
+          description: Type of precious metal
+          example: "gold"
+        weight:
+          type: number
+          minimum: 0
+          description: Weight of the product
+          example: 31.1
+        weightUnit:
+          type: string
+          enum: [grams, troy_ounces, kilograms]
+          description: Unit of weight measurement
+          example: "grams"
+        purity:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Metal purity as decimal (0.999 = 99.9%)
+          example: 0.9167
+        price:
+          type: number
+          minimum: 0
+          description: Current price per unit
+          example: 2100.50
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Price currency
+          example: "USD"
+        producer:
+          type: string
+          description: Manufacturer or mint name
+          example: "US Mint"
+        country:
+          type: string
+          description: Country of origin
+          example: "USA"
+        year:
+          type: integer
+          minimum: 1800
+          maximum: 2100
+          description: Year of production
+          example: 2024
+        description:
+          type: string
+          description: Detailed product description
+          example: "Official 1 oz American Gold Eagle coin from the US Mint..."
+        specifications:
+          type: object
+          description: Additional technical specifications
+          properties:
+            diameter:
+              type: number
+              description: Diameter in millimeters
+              example: 32.7
+            thickness:
+              type: number
+              description: Thickness in millimeters
+              example: 2.87
+            mintage:
+              type: integer
+              description: Total number minted
+              example: 500000
+            certification:
+              type: string
+              description: Certification details
+              example: "NGC MS70"
+        imageUrl:
+          type: string
+          format: uri
+          description: URL to product image
+          example: "https://cdn.goldsphere.vault/images/prod_1oz_american_eagle_gold_2024.jpg"
+        inStock:
+          type: boolean
+          description: Whether product is currently in stock
+          example: true
+        stockQuantity:
+          type: integer
+          minimum: 0
+          description: Available quantity in stock
+          example: 150
+        minimumOrderQuantity:
+          type: integer
+          minimum: 1
+          description: Minimum order quantity
+          example: 1
+        premiumPercentage:
+          type: number
+          minimum: 0
+          description: Premium over spot price as percentage
+          example: 5.5
+        tags:
+          type: array
+          items:
+            type: string
+          description: Product tags for categorization
+          example: ["investment", "collectible", "popular"]
+        createdAt:
+          type: string
+          format: date-time
+          description: Product creation timestamp
+          example: "2024-08-07T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-08-07T10:30:00Z"
+
+    ProductRegistrationRequest:
+      type: object
+      required:
+        - name
+        - type
+        - metal
+        - weight
+        - weightUnit
+        - purity
+        - price
+        - currency
+        - producer
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Product display name
+          example: "1 oz American Eagle Gold Coin 2024"
+        type:
+          type: string
+          enum: [coin, bar, round]
+          description: Type of precious metals product
+        metal:
+          type: string
+          enum: [gold, silver, platinum, palladium]
+          description: Type of precious metal
+        weight:
+          type: number
+          minimum: 0.001
+          description: Weight of the product
+        weightUnit:
+          type: string
+          enum: [grams, troy_ounces, kilograms]
+          description: Unit of weight measurement
+        purity:
+          type: number
+          minimum: 0.001
+          maximum: 1
+          description: Metal purity as decimal (0.999 = 99.9%)
+        price:
+          type: number
+          minimum: 0.01
+          description: Current price per unit
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CHF]
+          description: Price currency
+        producer:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Manufacturer or mint name
+        country:
+          type: string
+          maxLength: 100
+          description: Country of origin
+        year:
+          type: integer
+          minimum: 1800
+          maximum: 2100
+          description: Year of production
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed product description
+        specifications:
+          type: object
+          description: Additional technical specifications
+        inStock:
+          type: boolean
+          description: Whether product is currently in stock
+          default: true
+        stockQuantity:
+          type: integer
+          minimum: 0
+          description: Available quantity in stock
+        minimumOrderQuantity:
+          type: integer
+          minimum: 1
+          description: Minimum order quantity
+          default: 1
+        premiumPercentage:
+          type: number
+          minimum: 0
+          description: Premium over spot price as percentage
+        tags:
+          type: array
+          items:
+            type: string
+          description: Product tags for categorization
+
+    ProductUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Product display name
+        price:
+          type: number
+          minimum: 0.01
+          description: Current price per unit
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed product description
+        specifications:
+          type: object
+          description: Additional technical specifications
+        inStock:
+          type: boolean
+          description: Whether product is currently in stock
+        stockQuantity:
+          type: integer
+          minimum: 0
+          description: Available quantity in stock
+        minimumOrderQuantity:
+          type: integer
+          minimum: 1
+          description: Minimum order quantity
+        premiumPercentage:
+          type: number
+          minimum: 0
+          description: Premium over spot price as percentage
+        tags:
+          type: array
+          items:
+            type: string
+          description: Product tags for categorization
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 150
+        totalPages:
+          type: integer
+          example: 8
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: false
+
+    Error:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Invalid input data"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "price"
+                  message:
+                    type: string
+                    example: "Price must be greater than 0"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized - invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Products
+    description: Product catalog management operations
