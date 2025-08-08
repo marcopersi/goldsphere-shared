@@ -1,8 +1,4 @@
-// Product API Types
-export type ProductType = 'coin' | 'bar' | 'round';
-export type MetalType = 'gold' | 'silver' | 'platinum' | 'palladium';
-export type WeightUnit = 'grams' | 'troy_ounces' | 'kilograms';
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'CHF';
+import { Currency, ProductType, MetalType, WeightUnit, Pagination } from './common';
 
 export interface Product {
   id: string;
@@ -84,36 +80,6 @@ export interface BulkRegistrationResponse {
     failed: number;
   };
 }
-
-// Common Types
-export interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
-
-export interface ApiError {
-  success: false;
-  error: {
-    code: string;
-    message: string;
-    details?: {
-      field: string;
-      message: string;
-    }[];
-  };
-}
-
-export interface ApiSuccess<T> {
-  success: true;
-  data?: T;
-  message?: string;
-}
-
-export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 // Query Parameters
 export interface ProductQueryParams {

@@ -5,9 +5,9 @@ import {
   ProductsResponse,
   ProductQueryParams,
   BulkRegistrationRequest,
-  BulkRegistrationResponse,
-  ApiResponse 
+  BulkRegistrationResponse
 } from '../types/products';
+import { ApiResponse } from '../types/common';
 
 // File upload types - compatible with Express.Multer.File but standalone
 export interface UploadedFile {
