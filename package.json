@@ -1,6 +1,6 @@
 {
   "name": "@marcopersi/shared",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Pure TypeScript library with shared types, Zod schemas, and OpenAPI contracts for GoldSphere precious metals platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
     "ci": "npm run lint && npm run type-check && npm run build",
     "prepack": "npm run ci",
     "version:patch": "npm version patch",
-    "version:minor": "npm version minor", 
+    "version:minor": "npm version minor",
     "version:major": "npm version major",
     "release:patch": "npm run version:patch && git push --follow-tags",
     "release:minor": "npm run version:minor && git push --follow-tags",
