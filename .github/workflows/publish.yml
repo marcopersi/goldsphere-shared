@@ -12,7 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Use Node.js 20.x
+    - name: Use Node.js 20.x for npmjs.org
       uses: actions/setup-node@v4
       with:
         node-version: 20.x
@@ -31,22 +31,16 @@ jobs:
     - name: Build package
       run: npm run build
 
-    - name: Publish to npm
-      run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    # ---------------------------
-    # ADD THIS STEP TO SETUP GITHUB REGISTRY
-    - name: Configure GitHub Package Registry for npm
+    # --- Configure for GitHub Packages ---
+    - name: Configure for GitHub Package Registry
       uses: actions/setup-node@v4
       with:
         node-version: 20.x
         registry-url: 'https://npm.pkg.github.com'
-        scope: '@marcopersi'
-    # ---------------------------
+        scope: '@goldsphere'
+    # -------------------------------------
 
-    - name: Debug npm registry and auth (optional for troubleshooting)
+    - name: Debug npm registry and auth
       run: |
         npm config get registry
         npm whoami
