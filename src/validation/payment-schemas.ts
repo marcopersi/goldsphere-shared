@@ -255,11 +255,22 @@ export type PaymentMethodInput = z.infer<typeof PaymentMethodSchema>;
 export type PaymentIntentInput = z.infer<typeof PaymentIntentSchema>;
 export type PaymentErrorType = z.infer<typeof PaymentErrorSchema>;
 
+// Server-expected type names (without "Type" suffix)
+export type PaymentError = z.infer<typeof PaymentErrorSchema>;
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
+export type PaymentIntent = z.infer<typeof PaymentIntentSchema>;
+
 // Request types
 export type CreatePaymentIntentRequestType = z.infer<typeof CreatePaymentIntentRequestSchema>;
 export type ConfirmPaymentRequestType = z.infer<typeof ConfirmPaymentRequestSchema>;
 export type ListPaymentMethodsRequestType = z.infer<typeof ListPaymentMethodsRequestSchema>;
 export type RefundRequestType = z.infer<typeof RefundRequestSchema>;
+
+// Server-expected request type names (without "Type" suffix)
+export type CreatePaymentIntentRequest = z.infer<typeof CreatePaymentIntentRequestSchema>;
+export type ConfirmPaymentRequest = z.infer<typeof ConfirmPaymentRequestSchema>;
+export type ListPaymentMethodsRequest = z.infer<typeof ListPaymentMethodsRequestSchema>;
+export type RefundRequest = z.infer<typeof RefundRequestSchema>;
 
 // Response types  
 export type CreatePaymentIntentResponseType = z.infer<typeof CreatePaymentIntentResponseSchema>;
@@ -268,5 +279,13 @@ export type ListPaymentMethodsResponseType = z.infer<typeof ListPaymentMethodsRe
 export type RefundResponseType = z.infer<typeof RefundResponseSchema>;
 export type RetrievePaymentIntentResponseType = z.infer<typeof RetrievePaymentIntentResponseSchema>;
 
+// Server-expected response type names (without "Type" suffix)
+export type CreatePaymentIntentResponse = z.infer<typeof CreatePaymentIntentResponseSchema>;
+export type ConfirmPaymentResponse = z.infer<typeof ConfirmPaymentResponseSchema>;
+export type ListPaymentMethodsResponse = z.infer<typeof ListPaymentMethodsResponseSchema>;
+export type RefundResponse = z.infer<typeof RefundResponseSchema>;
+export type RetrievePaymentIntentResponse = z.infer<typeof RetrievePaymentIntentResponseSchema>;
+
 // Additional types
 export type PaymentWebhookEventType = z.infer<typeof PaymentWebhookEventSchema>;
+export type PaymentWebhookEvent = z.infer<typeof PaymentWebhookEventSchema>;

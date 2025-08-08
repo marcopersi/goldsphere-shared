@@ -10,8 +10,18 @@ export * from './types/common';
 export * from './types/products';
 export * from './types/portfolio';
 export * from './types/trading';
-export * from './types/payment';
 export * from './types/ui';
+
+// Payment types - Export only config and provider interfaces to avoid conflicts with Zod types
+export { 
+  PaymentProviderImplementation,
+  StripeConfig,
+  MockConfig,
+  ProviderConfig,
+  PaymentConfig,
+  PaymentPaginationParams,
+  PaymentPaginatedResponse
+} from './types/payment';
 
 // Validation Schemas (Zod) - Explicit exports to avoid conflicts
 export * from './validation/product-schemas';
@@ -56,7 +66,21 @@ export {
   type ListPaymentMethodsResponseType,
   type RefundResponseType,
   type RetrievePaymentIntentResponseType,
-  type PaymentWebhookEventType
+  type PaymentWebhookEventType,
+  // Server-expected Zod inferred types (without "Type" suffix)
+  type PaymentError,
+  type PaymentMethod,
+  type PaymentIntent,
+  type CreatePaymentIntentRequest,
+  type ConfirmPaymentRequest,
+  type ListPaymentMethodsRequest,
+  type RefundRequest,
+  type CreatePaymentIntentResponse,
+  type ConfirmPaymentResponse,
+  type ListPaymentMethodsResponse,
+  type RefundResponse,
+  type RetrievePaymentIntentResponse,
+  type PaymentWebhookEvent
 } from './validation/payment-schemas';
 
 // API Contracts & Handlers
@@ -77,4 +101,4 @@ export {
 export { z } from 'zod';
 
 // Package Metadata
-export const GOLDSPHERE_SHARED_VERSION = '1.0.3';
+export const GOLDSPHERE_SHARED_VERSION = '1.0.5';
