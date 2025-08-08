@@ -13,34 +13,50 @@ export * from './types/trading';
 export * from './types/payment';
 export * from './types/ui';
 
-// Explicit type exports for server requirements
-export { 
-  PaymentError,
-  CreatePaymentIntentRequest, 
-  ConfirmPaymentRequest,
-  RetrievePaymentIntentResponse,
-  ListPaymentMethodsResponse,
-  RefundRequest,
-  RefundResponse,
-  PaymentWebhookEvent,
-  PaymentMethod,
-  PaymentIntent
-} from './types/payment';
-
-// Validation Schemas (Zod)
+// Validation Schemas (Zod) - Explicit exports to avoid conflicts
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
-export * from './validation/payment-schemas';
-
-// Explicit exports for backward compatibility and server requirements
 export { 
-  PaymentIntentCreateSchema,
-  PaymentIntentConfirmSchema,
+  // Schemas
+  PaymentMethodTypeSchema,
+  PaymentIntentStatusSchema,
+  PaymentErrorTypeSchema,
+  PaymentMethodSchema,
+  PaymentIntentSchema,
+  PaymentErrorSchema,
   CreatePaymentIntentRequestSchema,
   ConfirmPaymentRequestSchema,
-  PaymentErrorSchema,
-  PaymentMethodSchema,
-  PaymentIntentSchema
+  ListPaymentMethodsRequestSchema,
+  RefundRequestSchema,
+  CreatePaymentIntentResponseSchema,
+  ConfirmPaymentResponseSchema,
+  ListPaymentMethodsResponseSchema,
+  RefundResponseSchema,
+  RetrievePaymentIntentResponseSchema,
+  PaymentWebhookEventSchema,
+  PaginationParamsSchema,
+  PaginatedResponseSchema,
+  PaymentSchemas,
+  // Legacy schema name aliases for backward compatibility
+  PaymentIntentCreateSchema,
+  PaymentIntentConfirmSchema,
+  // Validation helpers
+  validateCreatePaymentIntent,
+  validateConfirmPayment,
+  validateListPaymentMethods,
+  validateRefundRequest,
+  validateWebhookEvent,
+  // Zod inferred types (with "Type" suffix to avoid conflicts with interfaces)
+  type CreatePaymentIntentRequestType,
+  type ConfirmPaymentRequestType,
+  type ListPaymentMethodsRequestType,
+  type RefundRequestType,
+  type CreatePaymentIntentResponseType,
+  type ConfirmPaymentResponseType,
+  type ListPaymentMethodsResponseType,
+  type RefundResponseType,
+  type RetrievePaymentIntentResponseType,
+  type PaymentWebhookEventType
 } from './validation/payment-schemas';
 
 // API Contracts & Handlers
@@ -61,4 +77,4 @@ export {
 export { z } from 'zod';
 
 // Package Metadata
-export const GOLDSPHERE_SHARED_VERSION = '1.0.0';
+export const GOLDSPHERE_SHARED_VERSION = '1.0.3';

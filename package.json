@@ -1,6 +1,6 @@
 {
   "name": "@marcopersi/shared",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Pure TypeScript library with shared types, Zod schemas, and OpenAPI contracts for GoldSphere precious metals platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

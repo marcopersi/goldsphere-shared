@@ -153,6 +153,18 @@ export const RefundResponseSchema = z.object({
   error: PaymentErrorSchema.optional()
 });
 
+export const RetrievePaymentIntentResponseSchema = z.object({
+  success: z.boolean(),
+  paymentIntent: PaymentIntentSchema.optional(),
+  error: PaymentErrorSchema.optional()
+}).refine(
+  (data) => data.success ? !!data.paymentIntent : !!data.error,
+  {
+    message: 'Response must include paymentIntent on success or error on failure',
+    path: ['success']
+  }
+);
+
 // Webhook Event Schema
 export const PaymentWebhookEventSchema = z.object({
   id: z.string().min(1, 'Event ID is required'),
@@ -228,6 +240,7 @@ export const PaymentSchemas = {
   ConfirmPaymentResponse: ConfirmPaymentResponseSchema,
   ListPaymentMethodsResponse: ListPaymentMethodsResponseSchema,
   RefundResponse: RefundResponseSchema,
+  RetrievePaymentIntentResponse: RetrievePaymentIntentResponseSchema,
   
   // Events
   PaymentWebhookEvent: PaymentWebhookEventSchema,
@@ -237,11 +250,23 @@ export const PaymentSchemas = {
   PaginatedResponse: PaginatedResponseSchema
 };
 
-// Type inference helpers
+// Type inference helpers - Export all TypeScript types
 export type PaymentMethodInput = z.infer<typeof PaymentMethodSchema>;
 export type PaymentIntentInput = z.infer<typeof PaymentIntentSchema>;
-export type CreatePaymentIntentInput = z.infer<typeof CreatePaymentIntentRequestSchema>;
-export type ConfirmPaymentInput = z.infer<typeof ConfirmPaymentRequestSchema>;
-export type ListPaymentMethodsInput = z.infer<typeof ListPaymentMethodsRequestSchema>;
-export type RefundInput = z.infer<typeof RefundRequestSchema>;
-export type PaymentWebhookEventInput = z.infer<typeof PaymentWebhookEventSchema>;
+export type PaymentErrorType = z.infer<typeof PaymentErrorSchema>;
+
+// Request types
+export type CreatePaymentIntentRequestType = z.infer<typeof CreatePaymentIntentRequestSchema>;
+export type ConfirmPaymentRequestType = z.infer<typeof ConfirmPaymentRequestSchema>;
+export type ListPaymentMethodsRequestType = z.infer<typeof ListPaymentMethodsRequestSchema>;
+export type RefundRequestType = z.infer<typeof RefundRequestSchema>;
+
+// Response types  
+export type CreatePaymentIntentResponseType = z.infer<typeof CreatePaymentIntentResponseSchema>;
+export type ConfirmPaymentResponseType = z.infer<typeof ConfirmPaymentResponseSchema>;
+export type ListPaymentMethodsResponseType = z.infer<typeof ListPaymentMethodsResponseSchema>;
+export type RefundResponseType = z.infer<typeof RefundResponseSchema>;
+export type RetrievePaymentIntentResponseType = z.infer<typeof RetrievePaymentIntentResponseSchema>;
+
+// Additional types
+export type PaymentWebhookEventType = z.infer<typeof PaymentWebhookEventSchema>;
