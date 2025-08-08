@@ -19,6 +19,25 @@ export type Currency = 'USD' | 'EUR' | 'GBP' | 'CHF';
  */
 export type MetalType = 'gold' | 'silver' | 'platinum' | 'palladium';
 
+
+// Local interfaces that should be moved to @goldsphere/shared
+export interface Country {
+  code: string;
+  name: string;
+  nameDE: string;
+}
+
+export interface DeliveryOption {
+  id: string;
+  title: string;
+  description: string;
+  additionalInfo: string;
+  price: number;
+  currency: string;
+  type: "shipping" | "custody";
+  billingCycle?: "monthly" | "yearly";
+}
+
 /**
  * Weight units for precious metals
  */
