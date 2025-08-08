@@ -1,4 +1,4 @@
-import { Pagination } from './products';
+import { Pagination } from './common';
 
 // Core entities
 export interface Position {
