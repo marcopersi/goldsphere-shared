@@ -4,6 +4,14 @@
   "description": "Pure TypeScript library with shared types, Zod schemas, and OpenAPI contracts for GoldSphere precious metals platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcopersi/goldsphere-shared.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "@goldsphere:registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "dist",
     "src",
@@ -18,7 +26,13 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "ci": "npm run lint && npm run type-check && npm run build",
-    "prepack": "npm run ci"
+    "prepack": "npm run ci",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor", 
+    "version:major": "npm version major",
+    "release:patch": "npm run version:patch && git push --follow-tags",
+    "release:minor": "npm run version:minor && git push --follow-tags",
+    "release:major": "npm run version:major && git push --follow-tags"
   },
   "keywords": [
     "typescript",
@@ -45,12 +59,5 @@
   },
   "dependencies": {
     "zod": "^3.22.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/marcopersi/goldsphere-shared.git"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }
