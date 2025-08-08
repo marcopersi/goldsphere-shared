@@ -20,18 +20,26 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GOLDSPHERE_SHARED_VERSION = exports.z = void 0;
-// Core Types
+exports.GOLDSPHERE_SHARED_VERSION = exports.z = exports.ENV_VAR_MAPPINGS = exports.DEFAULT_PAYMENT_CONFIG = void 0;
+// Core Types (Common types exported first to avoid conflicts)
+__exportStar(require("./types/common"), exports);
 __exportStar(require("./types/products"), exports);
 __exportStar(require("./types/portfolio"), exports);
 __exportStar(require("./types/trading"), exports);
+__exportStar(require("./types/payment"), exports);
 __exportStar(require("./types/ui"), exports);
 // Validation Schemas (Zod)
 __exportStar(require("./validation/product-schemas"), exports);
 __exportStar(require("./validation/portfolio-schemas"), exports);
+__exportStar(require("./validation/payment-schemas"), exports);
 // API Contracts & Handlers
 __exportStar(require("./contracts/product-api"), exports);
 __exportStar(require("./contracts/portfolio-api"), exports);
+__exportStar(require("./contracts/payment-api"), exports);
+// Config (explicitly export to avoid conflicts)
+var payment_config_1 = require("./config/payment-config");
+Object.defineProperty(exports, "DEFAULT_PAYMENT_CONFIG", { enumerable: true, get: function () { return payment_config_1.DEFAULT_PAYMENT_CONFIG; } });
+Object.defineProperty(exports, "ENV_VAR_MAPPINGS", { enumerable: true, get: function () { return payment_config_1.ENV_VAR_MAPPINGS; } });
 // Utility Re-exports
 var zod_1 = require("zod");
 Object.defineProperty(exports, "z", { enumerable: true, get: function () { return zod_1.z; } });

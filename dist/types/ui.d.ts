@@ -1,3 +1,4 @@
+import { Currency, ApiMode } from './common';
 export type ToastVariant = "default" | "destructive" | "success" | "gold" | "silver" | "platinum";
 export interface ProductDisplayType {
     id: string;
@@ -6,7 +7,7 @@ export interface ProductDisplayType {
     image: string;
     isLocalImage?: boolean;
     price: number;
-    currency: string;
+    currency: Currency;
     weight: number;
     weightUnit: string;
     fineness: number;
@@ -16,7 +17,7 @@ export interface ProductDisplayType {
     countryCode: string;
     metal: string;
 }
-export type ApiMode = 'mock' | 'development' | 'production';
+export { ApiMode } from './common';
 export interface ApiConfig {
     mode: ApiMode;
     baseUrl: string;

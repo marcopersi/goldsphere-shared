@@ -1,10 +1,10 @@
 import { z } from 'zod';
+import { CurrencySchema } from './currency-schemas';
 
 // Enum schemas
 export const ProductTypeSchema = z.enum(['coin', 'bar', 'round']);
 export const MetalTypeSchema = z.enum(['gold', 'silver', 'platinum', 'palladium']);
 export const WeightUnitSchema = z.enum(['grams', 'troy_ounces', 'kilograms']);
-export const CurrencySchema = z.enum(['USD', 'EUR', 'GBP', 'CHF']);
 
 // Specifications schema (flexible object)
 export const SpecificationsSchema = z.object({

@@ -1,4 +1,5 @@
 // UI Component Types
+import { Currency, ApiMode } from './common';
 
 export type ToastVariant = 
   | "default"
@@ -15,7 +16,7 @@ export interface ProductDisplayType {
   image: string;
   isLocalImage?: boolean;
   price: number;
-  currency: string;
+  currency: Currency;
   weight: number;
   weightUnit: string;
   fineness: number;
@@ -26,7 +27,8 @@ export interface ProductDisplayType {
   metal: string;
 }
 
-export type ApiMode = 'mock' | 'development' | 'production';
+// Re-export ApiMode from common for backward compatibility
+export { ApiMode } from './common';
 
 export interface ApiConfig {
   mode: ApiMode;

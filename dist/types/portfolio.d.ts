@@ -1,4 +1,4 @@
-import { Pagination } from './products';
+import { Pagination } from './common';
 export interface Position {
     id: string;
     userId: string;

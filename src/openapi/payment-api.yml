@@ -1,0 +1,826 @@
+# Payment API OpenAPI Specification
+# File: goldsphere-shared/src/openapi/payment-api.yml
+
+openapi: 3.0.3
+info:
+  title: GoldSphere Payment API
+  description: |
+    Payment processing API for GoldSphere precious metals platform.
+    Supports multiple payment providers with Stripe as the primary implementation.
+    
+    ## Authentication
+    All endpoints require API authentication via Bearer token.
+    
+    ## Error Handling
+    The API returns consistent error responses with appropriate HTTP status codes.
+    
+    ## Idempotency
+    Payment operations support idempotency keys to prevent duplicate charges.
+    
+  version: 1.0.0
+  contact:
+    name: GoldSphere API Support
+    url: https://goldsphere.com/support
+    email: api-support@goldsphere.com
+  license:
+    name: Proprietary
+    url: https://goldsphere.com/license
+
+servers:
+  - url: https://api.goldsphere.com/v1
+    description: Production server
+  - url: https://staging-api.goldsphere.com/v1
+    description: Staging server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+paths:
+  /payment/create-intent:
+    post:
+      summary: Create Payment Intent
+      description: |
+        Creates a new payment intent for processing a payment.
+        This endpoint initializes the payment process and returns a client secret
+        that can be used on the frontend to complete the payment.
+      operationId: createPaymentIntent
+      tags:
+        - Payment Processing
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentIntentRequest'
+            examples:
+              card_payment:
+                summary: Card payment example
+                value:
+                  amount: 10000
+                  currency: EUR
+                  orderId: "order_123456"
+                  customerId: "cus_customer123"
+                  description: "1 oz Gold Coin Purchase"
+                  metadata:
+                    orderType: "precious_metals"
+                    source: "goldsphere_vault"
+              bank_transfer:
+                summary: Bank transfer example
+                value:
+                  amount: 50000
+                  currency: EUR
+                  orderId: "order_789012"
+                  automaticPaymentMethods:
+                    enabled: true
+                    allowRedirects: "always"
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentIntentResponse'
+              examples:
+                success:
+                  summary: Successful creation
+                  value:
+                    success: true
+                    paymentIntent:
+                      id: "pi_1234567890"
+                      clientSecret: "pi_1234567890_secret_abcdef"
+                      amount: 10000
+                      currency: "EUR"
+                      status: "requires_payment_method"
+                      orderId: "order_123456"
+                      createdAt: "2024-08-08T10:00:00Z"
+                      updatedAt: "2024-08-08T10:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payment/confirm:
+    post:
+      summary: Confirm Payment
+      description: |
+        Confirms a payment intent with the provided payment method.
+        This is typically called after the user has provided payment details
+        on the frontend.
+      operationId: confirmPayment
+      tags:
+        - Payment Processing
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmPaymentRequest'
+            examples:
+              confirm_with_payment_method:
+                summary: Confirm with payment method
+                value:
+                  paymentIntentId: "pi_1234567890"
+                  paymentMethodId: "pm_card_visa"
+                  returnUrl: "https://goldsphere.com/checkout/success"
+      responses:
+        '200':
+          description: Payment confirmation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmPaymentResponse'
+              examples:
+                success:
+                  summary: Payment succeeded
+                  value:
+                    success: true
+                    paymentIntent:
+                      id: "pi_1234567890"
+                      status: "succeeded"
+                      amount: 10000
+                      currency: "EUR"
+                      amountReceived: 10000
+                requires_action:
+                  summary: 3D Secure required
+                  value:
+                    success: false
+                    requiresAction: true
+                    nextAction:
+                      type: "redirect_to_url"
+                      redirectToUrl: "https://hooks.stripe.com/3d_secure_2_eap/..."
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /payment/intent/{paymentIntentId}:
+    get:
+      summary: Retrieve Payment Intent
+      description: Retrieves the current status and details of a payment intent
+      operationId: retrievePaymentIntent
+      tags:
+        - Payment Processing
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: The ID of the payment intent to retrieve
+          schema:
+            type: string
+            example: "pi_1234567890"
+      responses:
+        '200':
+          description: Payment intent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaymentIntentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payment/methods:
+    get:
+      summary: List Payment Methods
+      description: Retrieves saved payment methods for a customer
+      operationId: listPaymentMethods
+      tags:
+        - Payment Methods
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          description: The customer ID to retrieve payment methods for
+          schema:
+            type: string
+            example: "cus_customer123"
+        - name: type
+          in: query
+          required: false
+          description: Filter by payment method type
+          schema:
+            $ref: '#/components/schemas/PaymentMethodType'
+        - name: limit
+          in: query
+          required: false
+          description: Number of payment methods to return (1-100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: List of payment methods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentMethodsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payment/refund:
+    post:
+      summary: Refund Payment
+      description: Creates a refund for a successful payment
+      operationId: refundPayment
+      tags:
+        - Refunds
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+            examples:
+              full_refund:
+                summary: Full refund
+                value:
+                  paymentIntentId: "pi_1234567890"
+                  reason: "requested_by_customer"
+              partial_refund:
+                summary: Partial refund
+                value:
+                  paymentIntentId: "pi_1234567890"
+                  amount: 5000
+                  reason: "duplicate"
+      responses:
+        '200':
+          description: Refund created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /webhooks/stripe:
+    post:
+      summary: Stripe Webhook Endpoint
+      description: |
+        Webhook endpoint for receiving Stripe events.
+        This endpoint must verify the webhook signature using the webhook secret.
+      operationId: stripeWebhook
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentWebhookEvent'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid webhook signature or malformed payload
+        '500':
+          description: Webhook processing failed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PaymentMethodType:
+      type: string
+      enum: [card, bank_transfer, sepa_debit]
+      example: card
+
+    PaymentIntentStatus:
+      type: string
+      enum: 
+        - requires_payment_method
+        - requires_confirmation
+        - requires_action
+        - processing
+        - succeeded
+        - canceled
+        - requires_capture
+      example: succeeded
+
+    PaymentErrorType:
+      type: string
+      enum: [card_error, validation_error, api_error, authentication_error]
+      example: card_error
+
+    Currency:
+      type: string
+      enum: [EUR, USD, GBP, CHF]
+      example: EUR
+
+    PaymentMethod:
+      type: object
+      required: [id, type, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payment method
+          example: "pm_card_visa"
+        type:
+          $ref: '#/components/schemas/PaymentMethodType'
+        isDefault:
+          type: boolean
+          description: Whether this is the customer's default payment method
+          example: true
+        last4:
+          type: string
+          description: Last 4 digits of card (for card payments)
+          example: "4242"
+        brand:
+          type: string
+          description: Card brand (for card payments)
+          example: "visa"
+        expiryMonth:
+          type: integer
+          description: Card expiry month (for card payments)
+          example: 12
+        expiryYear:
+          type: integer
+          description: Card expiry year (for card payments)
+          example: 2025
+        bankName:
+          type: string
+          description: Bank name (for bank transfers)
+          example: "Deutsche Bank"
+        accountLast4:
+          type: string
+          description: Last 4 digits of account (for bank transfers)
+          example: "1234"
+        createdAt:
+          type: string
+          format: date-time
+          description: When the payment method was created
+          example: "2024-08-08T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the payment method was last updated
+          example: "2024-08-08T10:00:00Z"
+
+    PaymentIntent:
+      type: object
+      required: [id, clientSecret, amount, currency, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payment intent
+          example: "pi_1234567890"
+        clientSecret:
+          type: string
+          description: Client secret for frontend payment confirmation
+          example: "pi_1234567890_secret_abcdef"
+        amount:
+          type: integer
+          description: Payment amount in cents
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/Currency'
+        status:
+          $ref: '#/components/schemas/PaymentIntentStatus'
+        orderId:
+          type: string
+          description: Associated order ID
+          example: "order_123456"
+        customerId:
+          type: string
+          description: Customer ID
+          example: "cus_customer123"
+        paymentMethodId:
+          type: string
+          description: Payment method used
+          example: "pm_card_visa"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Custom metadata
+          example:
+            orderType: "precious_metals"
+            source: "goldsphere_vault"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-08-08T10:00:00Z"
+        amountReceived:
+          type: integer
+          description: Amount actually received (after fees)
+          example: 9850
+        fees:
+          type: integer
+          description: Processing fees in cents
+          example: 150
+        refunded:
+          type: boolean
+          description: Whether the payment has been refunded
+          example: false
+        refundedAmount:
+          type: integer
+          description: Total amount refunded in cents
+          example: 0
+
+    PaymentError:
+      type: object
+      required: [code, message, type]
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: "card_declined"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Your card was declined."
+        type:
+          $ref: '#/components/schemas/PaymentErrorType'
+        param:
+          type: string
+          description: Parameter that caused the error
+          example: "card_number"
+        declineCode:
+          type: string
+          description: Decline code from payment processor
+          example: "insufficient_funds"
+
+    CreatePaymentIntentRequest:
+      type: object
+      required: [amount, currency, orderId]
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+          description: Payment amount in cents
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/Currency'
+        orderId:
+          type: string
+          description: Order ID for this payment
+          example: "order_123456"
+        customerId:
+          type: string
+          description: Customer ID
+          example: "cus_customer123"
+        paymentMethodId:
+          type: string
+          description: Pre-selected payment method
+          example: "pm_card_visa"
+        automaticPaymentMethods:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Enable automatic payment methods
+              example: true
+            allowRedirects:
+              type: string
+              enum: [always, never]
+              description: Whether to allow redirect-based payment methods
+              example: "always"
+        description:
+          type: string
+          maxLength: 1000
+          description: Payment description
+          example: "Gold coin purchase"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Custom metadata
+          example:
+            orderType: "precious_metals"
+
+    CreatePaymentIntentResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        paymentIntent:
+          $ref: '#/components/schemas/PaymentIntent'
+        error:
+          $ref: '#/components/schemas/PaymentError'
+
+    ConfirmPaymentRequest:
+      type: object
+      required: [paymentIntentId]
+      properties:
+        paymentIntentId:
+          type: string
+          description: Payment intent to confirm
+          example: "pi_1234567890"
+        paymentMethodId:
+          type: string
+          description: Payment method to use
+          example: "pm_card_visa"
+        returnUrl:
+          type: string
+          format: uri
+          description: URL to redirect to after payment
+          example: "https://goldsphere.com/checkout/success"
+        useStripeSdk:
+          type: boolean
+          description: Whether to use Stripe SDK for 3D Secure
+          example: true
+
+    ConfirmPaymentResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        paymentIntent:
+          $ref: '#/components/schemas/PaymentIntent'
+        error:
+          $ref: '#/components/schemas/PaymentError'
+        requiresAction:
+          type: boolean
+          description: Whether additional action is required
+          example: false
+        nextAction:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "redirect_to_url"
+            redirectToUrl:
+              type: string
+              format: uri
+              example: "https://hooks.stripe.com/3d_secure_2_eap/..."
+
+    RetrievePaymentIntentResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        paymentIntent:
+          $ref: '#/components/schemas/PaymentIntent'
+        error:
+          $ref: '#/components/schemas/PaymentError'
+
+    ListPaymentMethodsResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        paymentMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        hasMore:
+          type: boolean
+          description: Whether there are more payment methods available
+          example: false
+        error:
+          $ref: '#/components/schemas/PaymentError'
+
+    RefundRequest:
+      type: object
+      required: [paymentIntentId]
+      properties:
+        paymentIntentId:
+          type: string
+          description: Payment intent to refund
+          example: "pi_1234567890"
+        amount:
+          type: integer
+          minimum: 1
+          description: Amount to refund in cents (partial refund)
+          example: 5000
+        reason:
+          type: string
+          enum: [duplicate, fraudulent, requested_by_customer]
+          description: Reason for the refund
+          example: "requested_by_customer"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Custom metadata for the refund
+
+    RefundResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        refund:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "re_1234567890"
+            amount:
+              type: integer
+              example: 5000
+            currency:
+              $ref: '#/components/schemas/Currency'
+            status:
+              type: string
+              enum: [pending, succeeded, failed, canceled]
+              example: "succeeded"
+            reason:
+              type: string
+              example: "requested_by_customer"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-08-08T11:00:00Z"
+        error:
+          $ref: '#/components/schemas/PaymentError'
+
+    PaymentWebhookEvent:
+      type: object
+      required: [id, type, data, createdAt, livemode]
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the event
+          example: "evt_1234567890"
+        type:
+          type: string
+          enum: 
+            - payment_intent.succeeded
+            - payment_intent.payment_failed
+            - payment_intent.canceled
+            - payment_method.attached
+          description: Type of event
+          example: "payment_intent.succeeded"
+        data:
+          type: object
+          properties:
+            object:
+              oneOf:
+                - $ref: '#/components/schemas/PaymentIntent'
+                - $ref: '#/components/schemas/PaymentMethod'
+          description: Event data object
+        createdAt:
+          type: string
+          format: date-time
+          description: When the event was created
+          example: "2024-08-08T10:30:00Z"
+        livemode:
+          type: boolean
+          description: Whether this event is from live mode
+          example: false
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                $ref: '#/components/schemas/PaymentError'
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "unauthorized"
+                  message:
+                    type: string
+                    example: "Invalid or missing authentication token"
+                  type:
+                    type: string
+                    example: "authentication_error"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "resource_not_found"
+                  message:
+                    type: string
+                    example: "The requested payment intent was not found"
+                  type:
+                    type: string
+                    example: "api_error"
+
+    ValidationError:
+      description: Validation error - invalid request data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                $ref: '#/components/schemas/PaymentError'
+              validationErrors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: "amount"
+                    message:
+                      type: string
+                      example: "Amount must be positive"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "internal_server_error"
+                  message:
+                    type: string
+                    example: "An unexpected error occurred"
+                  type:
+                    type: string
+                    example: "api_error"
+
+tags:
+  - name: Payment Processing
+    description: Core payment processing operations
+  - name: Payment Methods
+    description: Managing saved payment methods
+  - name: Refunds
+    description: Refund operations
+  - name: Webhooks
+    description: Webhook endpoints for payment events
