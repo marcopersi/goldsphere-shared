@@ -10,7 +10,7 @@ This guide explains how to migrate from git dependencies to proper npm package m
 ```json
 {
   "dependencies": {
-    "@goldsphere/shared": "git+https://github.com/marcopersi/goldsphere-shared.git"
+    "@marcopersi/shared": "git+https://github.com/marcopersi/goldsphere-shared.git"
   }
 }
 ```
@@ -19,7 +19,7 @@ This guide explains how to migrate from git dependencies to proper npm package m
 ```json
 {
   "dependencies": {
-    "@goldsphere/shared": "^1.0.0"
+    "@marcopersi/shared": "^1.0.0"
   }
 }
 ```
@@ -30,7 +30,7 @@ This guide explains how to migrate from git dependencies to proper npm package m
 
 Create `.npmrc` in your consuming projects:
 ```bash
-@goldsphere:registry=https://npm.pkg.github.com
+@marcopersi:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
@@ -53,7 +53,7 @@ Replace git dependency:
 ```json
 {
   "dependencies": {
-    "@goldsphere/shared": "^1.0.0"
+    "@marcopersi/shared": "^1.0.0"
   }
 }
 ```
@@ -88,12 +88,12 @@ npm install
 
 1. **Update dependency version** in package.json:
    ```bash
-   npm update @goldsphere/shared
+   npm update @marcopersi/shared
    ```
 
 2. **Or specify exact version**:
    ```bash
-   npm install @goldsphere/shared@1.2.0
+   npm install @marcopersi/shared@1.2.0
    ```
 
 ## 🏗️ Architecture Benefits
