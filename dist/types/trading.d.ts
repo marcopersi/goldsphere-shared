@@ -1,21 +1,6 @@
-import { Currency, MetalType, Pagination } from './products';
+import { MetalType, Pagination, Currency, PaymentMethodType, Address } from './common';
 export type OrderType = 'buy' | 'sell';
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentMethodType = 'credit_card' | 'bank_transfer' | 'crypto' | 'cash';
-export interface Address {
-    id?: string;
-    type: 'shipping' | 'billing';
-    firstName: string;
-    lastName: string;
-    company?: string;
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone?: string;
-    isDefault?: boolean;
-}
 export interface Order {
     id: string;
     userId: string;

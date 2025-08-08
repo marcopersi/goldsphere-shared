@@ -1,5 +1,5 @@
 import { Position, PositionCreateRequest, PositionUpdateRequest, PositionsResponse, PositionQueryParams, Transaction, TransactionCreateRequest, TransactionHistoryItem, TransactionsResponse, TransactionQueryParams, PortfolioSummary } from '../types/portfolio';
-import { ApiResponse } from '../types/products';
+import { ApiResponse } from '../types/common';
 import { BaseApiClient, TypedRequest, TypedResponse } from './product-api';
 /**
  * Portfolio API Contract Definitions

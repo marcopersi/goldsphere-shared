@@ -1,4 +1,5 @@
-import { Product, ProductRegistrationRequest, ProductUpdateRequest, ProductsResponse, ProductQueryParams, BulkRegistrationRequest, BulkRegistrationResponse, ApiResponse } from '../types/products';
+import { Product, ProductRegistrationRequest, ProductUpdateRequest, ProductsResponse, ProductQueryParams, BulkRegistrationRequest, BulkRegistrationResponse } from '../types/products';
+import { ApiResponse } from '../types/common';
 export interface UploadedFile {
     fieldname: string;
     originalname: string;

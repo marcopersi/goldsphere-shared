@@ -11,7 +11,7 @@ import {
   TransactionQueryParams,
   PortfolioSummary
 } from '../types/portfolio';
-import { ApiResponse } from '../types/products';
+import { ApiResponse } from '../types/common';
 import { BaseApiClient, TypedRequest, TypedResponse } from './product-api';
 
 /**

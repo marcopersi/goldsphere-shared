@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApiSuccessSchema = exports.ApiErrorSchema = exports.ApiErrorDetailSchema = exports.BulkRegistrationResponseSchema = exports.BulkRegistrationResultSchema = exports.BulkRegistrationRequestSchema = exports.ProductsResponseSchema = exports.PaginationSchema = exports.ProductQueryParamsSchema = exports.ProductUpdateRequestSchema = exports.ProductRegistrationRequestSchema = exports.ProductSchema = exports.SpecificationsSchema = exports.CurrencySchema = exports.WeightUnitSchema = exports.MetalTypeSchema = exports.ProductTypeSchema = void 0;
+exports.ApiSuccessSchema = exports.ApiErrorSchema = exports.ApiErrorDetailSchema = exports.BulkRegistrationResponseSchema = exports.BulkRegistrationResultSchema = exports.BulkRegistrationRequestSchema = exports.ProductsResponseSchema = exports.PaginationSchema = exports.ProductQueryParamsSchema = exports.ProductUpdateRequestSchema = exports.ProductRegistrationRequestSchema = exports.ProductSchema = exports.SpecificationsSchema = exports.WeightUnitSchema = exports.MetalTypeSchema = exports.ProductTypeSchema = void 0;
 const zod_1 = require("zod");
+const currency_schemas_1 = require("./currency-schemas");
 // Enum schemas
 exports.ProductTypeSchema = zod_1.z.enum(['coin', 'bar', 'round']);
 exports.MetalTypeSchema = zod_1.z.enum(['gold', 'silver', 'platinum', 'palladium']);
 exports.WeightUnitSchema = zod_1.z.enum(['grams', 'troy_ounces', 'kilograms']);
-exports.CurrencySchema = zod_1.z.enum(['USD', 'EUR', 'GBP', 'CHF']);
 // Specifications schema (flexible object)
 exports.SpecificationsSchema = zod_1.z.object({
     diameter: zod_1.z.number().optional(),
@@ -24,7 +24,7 @@ exports.ProductSchema = zod_1.z.object({
     weightUnit: exports.WeightUnitSchema,
     purity: zod_1.z.number().min(0.001).max(1),
     price: zod_1.z.number().positive(),
-    currency: exports.CurrencySchema,
+    currency: currency_schemas_1.CurrencySchema,
     producer: zod_1.z.string().min(1).max(100),
     country: zod_1.z.string().max(100).optional(),
     year: zod_1.z.number().int().min(1800).max(2100).optional(),
@@ -48,7 +48,7 @@ exports.ProductRegistrationRequestSchema = zod_1.z.object({
     weightUnit: exports.WeightUnitSchema,
     purity: zod_1.z.number().min(0.001).max(1),
     price: zod_1.z.number().min(0.01),
-    currency: exports.CurrencySchema,
+    currency: currency_schemas_1.CurrencySchema,
     producer: zod_1.z.string().min(1).max(100),
     country: zod_1.z.string().max(100).optional(),
     year: zod_1.z.number().int().min(1800).max(2100).optional(),

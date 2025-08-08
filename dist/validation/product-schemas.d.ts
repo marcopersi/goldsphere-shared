@@ -2,7 +2,6 @@ import { z } from 'zod';
 export declare const ProductTypeSchema: z.ZodEnum<["coin", "bar", "round"]>;
 export declare const MetalTypeSchema: z.ZodEnum<["gold", "silver", "platinum", "palladium"]>;
 export declare const WeightUnitSchema: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
-export declare const CurrencySchema: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
 export declare const SpecificationsSchema: z.ZodObject<{
     diameter: z.ZodOptional<z.ZodNumber>;
     thickness: z.ZodOptional<z.ZodNumber>;
@@ -28,7 +27,7 @@ export declare const ProductSchema: z.ZodObject<{
     weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
     purity: z.ZodNumber;
     price: z.ZodNumber;
-    currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+    currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
     producer: z.ZodString;
     country: z.ZodOptional<z.ZodString>;
     year: z.ZodOptional<z.ZodNumber>;
@@ -122,7 +121,7 @@ export declare const ProductRegistrationRequestSchema: z.ZodObject<{
     weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
     purity: z.ZodNumber;
     price: z.ZodNumber;
-    currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+    currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
     producer: z.ZodString;
     country: z.ZodOptional<z.ZodString>;
     year: z.ZodOptional<z.ZodNumber>;
@@ -304,7 +303,7 @@ export declare const ProductsResponseSchema: z.ZodObject<{
         weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
         purity: z.ZodNumber;
         price: z.ZodNumber;
-        currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+        currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
         producer: z.ZodString;
         country: z.ZodOptional<z.ZodString>;
         year: z.ZodOptional<z.ZodNumber>;
@@ -498,7 +497,7 @@ export declare const BulkRegistrationRequestSchema: z.ZodObject<{
         weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
         purity: z.ZodNumber;
         price: z.ZodNumber;
-        currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+        currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
         producer: z.ZodString;
         country: z.ZodOptional<z.ZodString>;
         year: z.ZodOptional<z.ZodNumber>;
@@ -636,7 +635,7 @@ export declare const BulkRegistrationResultSchema: z.ZodObject<{
         weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
         purity: z.ZodNumber;
         price: z.ZodNumber;
-        currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+        currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
         producer: z.ZodString;
         country: z.ZodOptional<z.ZodString>;
         year: z.ZodOptional<z.ZodNumber>;
@@ -801,7 +800,7 @@ export declare const BulkRegistrationResponseSchema: z.ZodObject<{
             weightUnit: z.ZodEnum<["grams", "troy_ounces", "kilograms"]>;
             purity: z.ZodNumber;
             price: z.ZodNumber;
-            currency: z.ZodEnum<["USD", "EUR", "GBP", "CHF"]>;
+            currency: z.ZodEnum<["EUR", "USD", "GBP", "CHF"]>;
             producer: z.ZodString;
             country: z.ZodOptional<z.ZodString>;
             year: z.ZodOptional<z.ZodNumber>;
@@ -959,13 +958,13 @@ export declare const BulkRegistrationResponseSchema: z.ZodObject<{
         successful: z.ZodNumber;
         failed: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
+        failed: number;
         total: number;
         successful: number;
-        failed: number;
     }, {
+        failed: number;
         total: number;
         successful: number;
-        failed: number;
     }>;
 }, "strip", z.ZodTypeAny, {
     success: boolean;
@@ -1003,9 +1002,9 @@ export declare const BulkRegistrationResponseSchema: z.ZodObject<{
         } | undefined;
     }[];
     summary: {
+        failed: number;
         total: number;
         successful: number;
-        failed: number;
     };
 }, {
     success: boolean;
@@ -1043,9 +1042,9 @@ export declare const BulkRegistrationResponseSchema: z.ZodObject<{
         } | undefined;
     }[];
     summary: {
+        failed: number;
         total: number;
         successful: number;
-        failed: number;
     };
 }>;
 export declare const ApiErrorDetailSchema: z.ZodObject<{
