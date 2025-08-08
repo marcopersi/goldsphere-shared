@@ -1,4 +1,5 @@
-# Build output
+# Build output (exclude from git - published via npm packages)
+dist/
 build/
 *.tsbuildinfo
 

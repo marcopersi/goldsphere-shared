@@ -1,1 +1,0 @@
-{"version":3,"file":"product-api.js","sourceRoot":"","sources":["../../src/contracts/product-api.ts"],"names":[],"mappings":";;;AAgOA;;;GAGG;AACU,QAAA,aAAa,GAAG;IAC3B,YAAY,EAAE,WAAW;IACzB,iBAAiB,EAAE,uBAAuB;IAC1C,cAAc,EAAE,WAAW;IAC3B,cAAc,EAAE,uBAAuB;IACvC,cAAc,EAAE,uBAAuB;IACvC,oBAAoB,EAAE,gBAAgB;CAC9B,CAAC"}
