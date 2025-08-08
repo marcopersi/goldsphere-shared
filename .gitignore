@@ -16,6 +16,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# NPM configuration with secrets
+.npmrc
+
 # Editor directories and files
 .vscode/
 .idea/
