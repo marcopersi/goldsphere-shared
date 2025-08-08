@@ -39,8 +39,10 @@ jobs:
         registry-url: 'https://npm.pkg.github.com'
         scope: '@goldsphere'
     # -------------------------------------
-    - name: Debug npm registry and auth
+
+    - name: Debug npm registry and auth (GitHub Packages)
       run: |
+        npm config set registry https://npm.pkg.github.com
         npm config get registry
         npm whoami
       env:
@@ -50,4 +52,3 @@ jobs:
       run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GOLDSPHERE_PUBLISH_NPM_PACKAGE_TOKEN }}
-      continue-on-error: true
