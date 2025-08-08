@@ -10,7 +10,7 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
-    "@goldsphere:registry": "https://npm.pkg.github.com"
+    "@marcopersi:registry": "https://npm.pkg.github.com"
   },
   "files": [
     "dist",
