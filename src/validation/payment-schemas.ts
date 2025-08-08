@@ -202,6 +202,10 @@ export const validateWebhookEvent = (data: unknown) => {
   return PaymentWebhookEventSchema.safeParse(data);
 };
 
+// Legacy schema name aliases for backward compatibility
+export const PaymentIntentCreateSchema = CreatePaymentIntentRequestSchema;
+export const PaymentIntentConfirmSchema = ConfirmPaymentRequestSchema;
+
 // Export all schemas for use in API validation
 export const PaymentSchemas = {
   // Entities
@@ -214,6 +218,10 @@ export const PaymentSchemas = {
   ConfirmPaymentRequest: ConfirmPaymentRequestSchema,
   ListPaymentMethodsRequest: ListPaymentMethodsRequestSchema,
   RefundRequest: RefundRequestSchema,
+  
+  // Legacy aliases
+  PaymentIntentCreateSchema: CreatePaymentIntentRequestSchema,
+  PaymentIntentConfirmSchema: ConfirmPaymentRequestSchema,
   
   // Responses
   CreatePaymentIntentResponse: CreatePaymentIntentResponseSchema,

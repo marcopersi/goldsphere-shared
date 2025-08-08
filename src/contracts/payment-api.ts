@@ -97,6 +97,56 @@ export interface PaymentAPIClient {
 }
 
 /**
+ * Payment Service interface for server-side operations
+ */
+export interface PaymentService {
+  /**
+   * Create a new payment intent
+   */
+  createPaymentIntent(
+    request: CreatePaymentIntentRequest
+  ): Promise<CreatePaymentIntentResponse>;
+
+  /**
+   * Confirm a payment intent
+   */
+  confirmPayment(
+    request: ConfirmPaymentRequest
+  ): Promise<ConfirmPaymentResponse>;
+
+  /**
+   * Retrieve a payment intent by ID
+   */
+  retrievePaymentIntent(
+    paymentIntentId: string
+  ): Promise<RetrievePaymentIntentResponse>;
+
+  /**
+   * List payment methods for a customer
+   */
+  listPaymentMethods(
+    customerId: string,
+    type?: PaymentMethod['type'],
+    limit?: number
+  ): Promise<ListPaymentMethodsResponse>;
+
+  /**
+   * Create a refund
+   */
+  refundPayment(
+    request: RefundRequest
+  ): Promise<RefundResponse>;
+
+  /**
+   * Process webhook events
+   */
+  processWebhook(
+    event: PaymentWebhookEvent,
+    signature: string
+  ): Promise<{ received: boolean }>;
+}
+
+/**
  * Error types that can occur during API operations
  */
 export type PaymentAPIError = 
