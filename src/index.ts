@@ -8,6 +8,14 @@
  */
 
 // =============================================================================
+// API CONTRACTS - Export all API interfaces and implementations
+// =============================================================================
+export * from './contracts/product-api';
+export * from './contracts/portfolio-api';
+export * from './contracts/payment-api';
+export * from './contracts/reference-data-api';
+
+// =============================================================================
 // CORE TYPES - Export everything from all type modules
 // =============================================================================
 export * from './types/common';
@@ -28,11 +36,29 @@ export {
 } from './types/payment';
 
 // =============================================================================
+// CLASS-BASED ENUMS - Export with explicit naming to avoid conflicts
+// =============================================================================
+export { Metal } from './enums/metal';
+export { ProductType as ProductTypeEnum } from './enums/product-type';
+export { Country as CountryEnum } from './enums/country';
+export { Currency as CurrencyEnum } from './enums/currency';
+export { Producer } from './enums/producer';
+
+// =============================================================================
 // VALIDATION SCHEMAS - Export everything from all validation modules
 // =============================================================================
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
 export * from './validation/currency-schemas';
+
+// Enum validation schemas - Export with explicit naming
+export { 
+  MetalEnumSchema,
+  ProductTypeEnumSchema,
+  CountryEnumSchema,
+  CurrencyEnumSchema,
+  ProducerEnumSchema
+} from './validation/enum-schemas';
 
 // Payment validation schemas - Export schemas AND explicitly export all Zod-inferred types
 export {

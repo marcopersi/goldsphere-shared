@@ -1,0 +1,469 @@
+openapi: 3.0.3
+info:
+  title: GoldSphere Reference Data API
+  description: API for retrieving reference data such as metals, product types, countries, currencies, and producers
+  version: 1.0.0
+  contact:
+    name: GoldSphere API Team
+    email: api@goldsphere.com
+
+servers:
+  - url: https://api.goldsphere.com/v1
+    description: Production server
+  - url: https://staging-api.goldsphere.com/v1
+    description: Staging server
+  - url: http://localhost:3000/v1
+    description: Local development server
+
+paths:
+  /api/reference-data:
+    get:
+      summary: Get all reference data
+      description: Retrieve all reference data including metals, product types, countries, currencies, and producers
+      operationId: getAllReferenceData
+      tags:
+        - Reference Data
+      responses:
+        '200':
+          description: Successfully retrieved all reference data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceDataResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/metals:
+    get:
+      summary: Get all metals
+      description: Retrieve all supported precious metals
+      operationId: getMetals
+      tags:
+        - Reference Data
+        - Metals
+      responses:
+        '200':
+          description: Successfully retrieved metals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetalsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/product-types:
+    get:
+      summary: Get all product types
+      description: Retrieve all supported product types
+      operationId: getProductTypes
+      tags:
+        - Reference Data
+        - Products
+      responses:
+        '200':
+          description: Successfully retrieved product types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductTypesResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/countries:
+    get:
+      summary: Get all countries
+      description: Retrieve all supported countries
+      operationId: getCountries
+      tags:
+        - Reference Data
+        - Countries
+      responses:
+        '200':
+          description: Successfully retrieved countries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountriesResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/currencies:
+    get:
+      summary: Get all currencies
+      description: Retrieve all supported currencies
+      operationId: getCurrencies
+      tags:
+        - Reference Data
+        - Currencies
+      responses:
+        '200':
+          description: Successfully retrieved currencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrenciesResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/producers:
+    get:
+      summary: Get all producers
+      description: Retrieve all producers/mints
+      operationId: getProducers
+      tags:
+        - Reference Data
+        - Producers
+      responses:
+        '200':
+          description: Successfully retrieved producers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProducersResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reference-data/producers/country/{countryCode}:
+    get:
+      summary: Get producers by country
+      description: Retrieve producers from a specific country
+      operationId: getProducersByCountry
+      tags:
+        - Reference Data
+        - Producers
+      parameters:
+        - name: countryCode
+          in: path
+          required: true
+          description: ISO 3166-1 alpha-2 country code (e.g., US, CA, AU)
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}$'
+            example: "CA"
+      responses:
+        '200':
+          description: Successfully retrieved producers for the country
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProducersResponse'
+        '400':
+          description: Invalid country code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Country not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    MetalReference:
+      type: object
+      required:
+        - symbol
+        - name
+      properties:
+        symbol:
+          type: string
+          description: Chemical symbol of the metal
+          example: "AU"
+        name:
+          type: string
+          description: Full name of the metal
+          example: "Gold"
+
+    ProductTypeReference:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the product type
+          example: "Coin"
+
+    CountryReference:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code (lowercase)
+          example: "us"
+        name:
+          type: string
+          description: Full name of the country
+          example: "United States"
+
+    CurrencyReference:
+      type: object
+      required:
+        - countryCode
+        - isoCode3
+        - isoNumericCode
+      properties:
+        countryCode:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+          example: "US"
+        isoCode3:
+          type: string
+          description: ISO 4217 3-letter currency code
+          example: "USD"
+        isoNumericCode:
+          type: integer
+          description: ISO 4217 numeric currency code
+          example: 840
+
+    ProducerReference:
+      type: object
+      required:
+        - code
+        - name
+        - countryCode
+      properties:
+        code:
+          type: string
+          description: Short code for the producer
+          example: "RCM"
+        name:
+          type: string
+          description: Full name of the producer
+          example: "Royal Canadian Mint"
+        countryCode:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+          example: "CA"
+
+    ReferenceDataResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - metals
+            - productTypes
+            - countries
+            - currencies
+            - producers
+          properties:
+            metals:
+              type: array
+              items:
+                $ref: '#/components/schemas/MetalReference'
+            productTypes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductTypeReference'
+            countries:
+              type: array
+              items:
+                $ref: '#/components/schemas/CountryReference'
+            currencies:
+              type: array
+              items:
+                $ref: '#/components/schemas/CurrencyReference'
+            producers:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProducerReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    MetalsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetalReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    ProductTypesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductTypeReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    CountriesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    CurrenciesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    ProducersResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProducerReference'
+        error:
+          type: string
+          description: Error message if success is false
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error message
+          example: "Internal server error"
+
+  examples:
+    AllReferenceDataExample:
+      summary: Complete reference data response
+      value:
+        success: true
+        data:
+          metals:
+            - symbol: "AU"
+              name: "Gold"
+            - symbol: "AG"
+              name: "Silver"
+            - symbol: "PT"
+              name: "Platinum"
+            - symbol: "PD"
+              name: "Palladium"
+          productTypes:
+            - name: "Coin"
+            - name: "Bar"
+            - name: "Round"
+          countries:
+            - code: "us"
+              name: "United States"
+            - code: "ca"
+              name: "Canada"
+            - code: "au"
+              name: "Australia"
+          currencies:
+            - countryCode: "US"
+              isoCode3: "USD"
+              isoNumericCode: 840
+            - countryCode: "EU"
+              isoCode3: "EUR"
+              isoNumericCode: 978
+          producers:
+            - code: "RCM"
+              name: "Royal Canadian Mint"
+              countryCode: "CA"
+            - code: "PM"
+              name: "Perth Mint"
+              countryCode: "AU"
+
+tags:
+  - name: Reference Data
+    description: Reference data operations
+  - name: Metals
+    description: Precious metals reference data
+  - name: Products
+    description: Product types reference data
+  - name: Countries
+    description: Countries reference data
+  - name: Currencies
+    description: Currencies reference data
+  - name: Producers
+    description: Producers/mints reference data
