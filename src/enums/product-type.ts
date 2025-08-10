@@ -9,7 +9,6 @@ export class ProductType {
   static readonly CAST_BAR = new ProductType('Cast Bar');
   static readonly MINTED_BAR = new ProductType('Minted Bar');
   static readonly COMBI_BAR = new ProductType('CombiBar');
-  static readonly ROUND = new ProductType('Round');
 
   private constructor(
     public readonly name: string
@@ -18,7 +17,7 @@ export class ProductType {
   static values(): ProductType[] {
     return [
       this.COIN, this.BAR, this.MEDALLION, this.JEWELRY,
-      this.CAST_BAR, this.MINTED_BAR, this.COMBI_BAR, this.ROUND
+      this.CAST_BAR, this.MINTED_BAR, this.COMBI_BAR
     ];
   }
 
