@@ -15,6 +15,7 @@ export * from './contracts/portfolio-api';
 export * from './contracts/payment-api';
 export * from './contracts/reference-data-api';
 export * from './contracts/custody-api';
+export * from './contracts/orders-api';
 
 // =============================================================================
 // CORE TYPES - Export everything from all type modules
@@ -56,6 +57,7 @@ export { CustodyServiceType } from './enums/custody-service-type';
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
 export * from './validation/currency-schemas';
+export * from './validation/order-schemas';
 
 // Enum validation schemas - Export with explicit naming
 export { 
@@ -74,6 +76,15 @@ export {
   PaymentFrequencyEnumSchema,
   CustodyServiceTypeEnumSchema
 } from './validation/custody-schemas';
+
+// Order validation schemas - Export helper functions only (enums already exported above)
+export {
+  validateOrderType,
+  isValidOrderType,
+  isValidOrderStatus,
+  getValidStatusTransitions,
+  isValidStatusTransition
+} from './validation/order-schemas';
 
 // Payment validation schemas - Export schemas AND explicitly export all Zod-inferred types
 export {
@@ -163,10 +174,39 @@ export {
 } from './validation/payment-schemas';
 
 // =============================================================================
-// SCHEMAS - Export custody-specific schemas
+// SCHEMAS - Export custody and order schemas (avoiding conflicts)
 // =============================================================================
 export * from './schemas/custody';
 export * from './schemas/custody-api';
+export * from './schemas/orders';
+
+// Export order-api schemas with explicit naming to avoid conflicts
+export {
+  CreateOrderRequestSchema,
+  UpdateOrderRequestSchema,
+  UpdateOrderStatusRequestSchema,
+  OrderResponseSchema as OrderApiResponseSchema,
+  CreateOrderResponseSchema,
+  UpdateOrderResponseSchema,
+  OrdersResponseSchema as OrderApiListResponseSchema,
+  OrderCalculationResponseSchema,
+  OrderStatsResponseSchema,
+  OrderQueryParamsSchema,
+  OrderStatsQuerySchema,
+  validateOrderItems,
+  validateOrderTotals,
+  calculateOrderTotals,
+  // Export types with Schema suffix to avoid conflicts
+  type CreateOrderRequest as CreateOrderRequestType,
+  type UpdateOrderRequest as UpdateOrderRequestType,
+  type UpdateOrderStatusRequest as UpdateOrderStatusRequestType,
+  type OrderResponse as OrderApiResponse,
+  type CreateOrderResponse as CreateOrderApiResponse,
+  type UpdateOrderResponse as UpdateOrderApiResponse,
+  type OrderQueryParams as OrderApiQueryParams,
+  type OrderCalculationResponse as OrderApiCalculationResponse,
+  type OrderStatsResponse as OrderApiStatsResponse
+} from './schemas/orders-api';
 
 // =============================================================================
 // API CONTRACTS - Export EVERYTHING from all contract modules explicitly
