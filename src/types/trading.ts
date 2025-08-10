@@ -1,8 +1,6 @@
 // Trading API Types
-import { MetalType, Pagination, Currency, PaymentMethodType, Address } from './common';
-
-export type OrderType = 'buy' | 'sell';
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+import { Pagination, PaymentMethodType, Address } from './common';
+import { Metal, Currency, OrderType, OrderStatus } from '../enums';
 
 export interface Order {
   id: string;
@@ -126,7 +124,7 @@ export interface LivePricesResponse {
 }
 
 export interface HistoricalPriceData {
-  metal: MetalType;
+  metal: Metal;
   currency: Currency;
   period: '1d' | '7d' | '1m' | '3m' | '6m' | '1y' | '5y';
   data: {
@@ -146,12 +144,12 @@ export interface OrderQueryParams {
 }
 
 export interface PriceQueryParams {
-  metals?: MetalType[];
+  metals?: Metal[];
   currency?: Currency;
 }
 
 export interface HistoricalPriceParams {
-  metal: MetalType;
+  metal: Metal;
   period: '1d' | '7d' | '1m' | '3m' | '6m' | '1y' | '5y';
   currency?: Currency;
 }

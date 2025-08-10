@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { CurrencySchema } from './currency-schemas';
+import { MetalEnumSchema, ProductTypeEnumSchema, CountryEnumSchema, CurrencyEnumSchema, ProducerEnumSchema } from './enum-schemas';
 
-// Enum schemas
-export const ProductTypeSchema = z.enum(['coin', 'bar', 'round']);
-export const MetalTypeSchema = z.enum(['gold', 'silver', 'platinum', 'palladium']);
+// Enum schemas - Updated to use class-based enums
+export const ProductTypeSchema = ProductTypeEnumSchema;
+export const MetalTypeSchema = MetalEnumSchema;
 export const WeightUnitSchema = z.enum(['grams', 'troy_ounces', 'kilograms']);
 
 // Specifications schema (flexible object)
@@ -24,9 +24,9 @@ export const ProductSchema = z.object({
   weightUnit: WeightUnitSchema,
   purity: z.number().min(0.001).max(1),
   price: z.number().positive(),
-  currency: CurrencySchema,
-  producer: z.string().min(1).max(100),
-  country: z.string().max(100).optional(),
+  currency: CurrencyEnumSchema,
+  producer: ProducerEnumSchema,
+  country: CountryEnumSchema.optional(),
   year: z.number().int().min(1800).max(2100).optional(),
   description: z.string().max(2000).optional(),
   specifications: SpecificationsSchema.optional(),
@@ -49,9 +49,9 @@ export const ProductRegistrationRequestSchema = z.object({
   weightUnit: WeightUnitSchema,
   purity: z.number().min(0.001).max(1),
   price: z.number().min(0.01),
-  currency: CurrencySchema,
-  producer: z.string().min(1).max(100),
-  country: z.string().max(100).optional(),
+  currency: CurrencyEnumSchema,
+  producer: ProducerEnumSchema,
+  country: CountryEnumSchema.optional(),
   year: z.number().int().min(1800).max(2100).optional(),
   description: z.string().max(2000).optional(),
   specifications: SpecificationsSchema.optional(),
@@ -81,7 +81,7 @@ export const ProductQueryParamsSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20).optional(),
   metal: MetalTypeSchema.optional(),
   type: ProductTypeSchema.optional(),
-  producer: z.string().optional(),
+  producer: ProducerEnumSchema.optional(),
 });
 
 // Pagination schema

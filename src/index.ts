@@ -43,6 +43,8 @@ export { ProductType as ProductTypeEnum } from './enums/product-type';
 export { Country as CountryEnum } from './enums/country';
 export { Currency as CurrencyEnum } from './enums/currency';
 export { Producer } from './enums/producer';
+export { OrderType } from './enums/order-type';
+export { OrderStatus } from './enums/order-status';
 
 // =============================================================================
 // VALIDATION SCHEMAS - Export everything from all validation modules
@@ -57,7 +59,9 @@ export {
   ProductTypeEnumSchema,
   CountryEnumSchema,
   CurrencyEnumSchema,
-  ProducerEnumSchema
+  ProducerEnumSchema,
+  OrderTypeEnumSchema,
+  OrderStatusEnumSchema
 } from './validation/enum-schemas';
 
 // Payment validation schemas - Export schemas AND explicitly export all Zod-inferred types
