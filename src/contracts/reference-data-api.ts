@@ -5,7 +5,7 @@
  * such as metals, product types, countries, currencies, and producers.
  */
 
-import { Metal, ProductType, Country, Currency, Producer } from '../enums';
+import { Metal, ProductType, Country, Currency, Producer, Custodian, PaymentFrequency, CustodyServiceType } from '../enums';
 
 // Reference Data Response Types
 export interface MetalReference {
@@ -34,6 +34,22 @@ export interface ProducerReference {
   countryCode: string;
 }
 
+export interface CustodianReference {
+  name: string;
+  description?: string;
+}
+
+export interface PaymentFrequencyReference {
+  value: string;
+  label: string;
+  durationDays: number;
+}
+
+export interface CustodyServiceTypeReference {
+  name: string;
+  description?: string;
+}
+
 // Main Reference Data Response
 export interface ReferenceDataResponse {
   success: boolean;
@@ -43,6 +59,9 @@ export interface ReferenceDataResponse {
     countries: CountryReference[];
     currencies: CurrencyReference[];
     producers: ProducerReference[];
+    custodians: CustodianReference[];
+    paymentFrequencies: PaymentFrequencyReference[];
+    custodyServiceTypes: CustodyServiceTypeReference[];
   };
   error?: string;
 }
@@ -75,6 +94,24 @@ export interface CurrenciesResponse {
 export interface ProducersResponse {
   success: boolean;
   data: ProducerReference[];
+  error?: string;
+}
+
+export interface CustodiansResponse {
+  success: boolean;
+  data: CustodianReference[];
+  error?: string;
+}
+
+export interface PaymentFrequenciesResponse {
+  success: boolean;
+  data: PaymentFrequencyReference[];
+  error?: string;
+}
+
+export interface CustodyServiceTypesResponse {
+  success: boolean;
+  data: CustodyServiceTypeReference[];
   error?: string;
 }
 
@@ -128,6 +165,9 @@ export interface ReferenceDataApiClient {
   getCurrencies(): Promise<CurrenciesResponse>;
   getProducers(): Promise<ProducersResponse>;
   getProducersByCountry(countryCode: string): Promise<ProducersResponse>;
+  getCustodians(): Promise<CustodiansResponse>;
+  getPaymentFrequencies(): Promise<PaymentFrequenciesResponse>;
+  getCustodyServiceTypes(): Promise<CustodyServiceTypesResponse>;
 }
 
 // Service Interface
@@ -168,6 +208,21 @@ export interface ReferenceDataService {
   getProducersByCountry(countryCode: string): ProducerReference[];
 
   /**
+   * Get custodians reference data
+   */
+  getCustodians(): CustodianReference[];
+
+  /**
+   * Get payment frequencies reference data
+   */
+  getPaymentFrequencies(): PaymentFrequencyReference[];
+
+  /**
+   * Get custody service types reference data
+   */
+  getCustodyServiceTypes(): CustodyServiceTypeReference[];
+
+  /**
    * Validate and get enum instance by value
    */
   getMetalByValue(value: string): Metal | undefined;
@@ -188,6 +243,9 @@ export class DefaultReferenceDataService implements ReferenceDataService {
         countries: this.getCountries(),
         currencies: this.getCurrencies(),
         producers: this.getProducers(),
+        custodians: this.getCustodians(),
+        paymentFrequencies: this.getPaymentFrequencies(),
+        custodyServiceTypes: this.getCustodyServiceTypes(),
       }
     };
   }
@@ -214,6 +272,38 @@ export class DefaultReferenceDataService implements ReferenceDataService {
 
   getProducersByCountry(countryCode: string): ProducerReference[] {
     return Producer.fromCountry(countryCode).map((producer: Producer) => producer.toJSON());
+  }
+
+  getCustodians(): CustodianReference[] {
+    return Custodian.values().map((custodian: Custodian) => ({
+      name: custodian.name
+    }));
+  }
+
+  getPaymentFrequencies(): PaymentFrequencyReference[] {
+    return PaymentFrequency.values().map((frequency: PaymentFrequency) => ({
+      value: frequency.value,
+      label: frequency.displayName,
+      durationDays: this.getDurationDaysForFrequency(frequency.value)
+    }));
+  }
+
+  getCustodyServiceTypes(): CustodyServiceTypeReference[] {
+    return CustodyServiceType.values().map((type: CustodyServiceType) => ({
+      name: type.value,
+      description: type.description
+    }));
+  }
+
+  private getDurationDaysForFrequency(frequency: string): number {
+    switch (frequency) {
+      case 'daily': return 1;
+      case 'weekly': return 7;
+      case 'monthly': return 30;
+      case 'quarterly': return 90;
+      case 'yearly': return 365;
+      default: return 30;
+    }
   }
 
   getMetalByValue(value: string): Metal | undefined {
