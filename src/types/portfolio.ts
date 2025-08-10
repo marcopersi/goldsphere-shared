@@ -1,4 +1,5 @@
 import { Pagination } from './common';
+import { Metal, Country, Producer } from '../enums';
 
 // Core entities
 export interface Position {
@@ -9,8 +10,8 @@ export interface Position {
   purchasePrice: number;
   marketPrice: number;
   quantity: number;
-  issuingCountry: string;
-  producer: string;
+  issuingCountry: Country;
+  producer: Producer;
   certifiedProvenance: boolean;
   status: "active" | "closed";
   closedDate?: string; // ISO date string
@@ -43,8 +44,8 @@ export interface PositionCreateRequest {
   purchaseDate: string;
   purchasePrice: number;
   quantity: number;
-  issuingCountry: string;
-  producer: string;
+  issuingCountry: Country;
+  producer: Producer;
   certifiedProvenance: boolean;
   notes?: string;
 }
@@ -94,8 +95,8 @@ export interface PositionQueryParams {
   page?: number;
   limit?: number;
   status?: "active" | "closed";
-  metal?: "gold" | "silver" | "platinum" | "palladium";
-  producer?: string;
+  metal?: Metal;
+  producer?: Producer;
 }
 
 export interface TransactionQueryParams {

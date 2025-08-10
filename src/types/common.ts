@@ -11,16 +11,21 @@
 
 /**
  * Supported currencies in the GoldSphere platform
+ * @deprecated Use `Currency` class from '../enums/currency' instead for type-safe enum functionality
  */
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'CHF';
 
 /**
  * Metal types for precious metals
+ * @deprecated Use `Metal` class from '../enums/metal' instead for type-safe enum functionality
  */
 export type MetalType = 'gold' | 'silver' | 'platinum' | 'palladium';
 
 
-// Local interfaces that should be moved to @goldsphere/shared
+/**
+ * Local interfaces that should be moved to @goldsphere/shared
+ * @deprecated Use `Country` class from '../enums/country' instead for type-safe enum functionality
+ */
 export interface Country {
   code: string;
   name: string;
@@ -45,6 +50,7 @@ export type WeightUnit = 'grams' | 'troy_ounces' | 'kilograms';
 
 /**
  * Product types for precious metals
+ * @deprecated Use `ProductType` class from '../enums/product-type' instead for type-safe enum functionality
  */
 export type ProductType = 'coin' | 'bar' | 'round';
 

@@ -11,3 +11,5 @@ export { ProductType } from './product-type';
 export { Country } from './country';
 export { Currency } from './currency';
 export { Producer } from './producer';
+export { OrderType } from './order-type';
+export { OrderStatus } from './order-status';

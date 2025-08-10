@@ -1,17 +1,18 @@
-import { Currency, ProductType, MetalType, WeightUnit, Pagination } from './common';
+import { WeightUnit, Pagination } from './common';
+import { Metal, ProductType, Country, Currency, Producer } from '../enums';
 
 export interface Product {
   id: string;
   name: string;
   type: ProductType;
-  metal: MetalType;
+  metal: Metal;
   weight: number;
   weightUnit: WeightUnit;
   purity: number;
   price: number;
   currency: Currency;
-  producer: string;
-  country?: string;
+  producer: Producer;
+  country?: Country;
   year?: number;
   description?: string;
   specifications?: Record<string, any>;
@@ -28,14 +29,14 @@ export interface Product {
 export interface ProductRegistrationRequest {
   name: string;
   type: ProductType;
-  metal: MetalType;
+  metal: Metal;
   weight: number;
   weightUnit: WeightUnit;
   purity: number;
   price: number;
   currency: Currency;
-  producer: string;
-  country?: string;
+  producer: Producer;
+  country?: Country;
   year?: number;
   description?: string;
   specifications?: Record<string, any>;
@@ -85,7 +86,7 @@ export interface BulkRegistrationResponse {
 export interface ProductQueryParams {
   page?: number;
   limit?: number;
-  metal?: MetalType;
+  metal?: Metal;
   type?: ProductType;
-  producer?: string;
+  producer?: Producer;
 }

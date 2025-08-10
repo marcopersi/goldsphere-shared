@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CountryEnumSchema, ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
 
 // Enum schemas
 export const PositionStatusSchema = z.enum(['active', 'closed']);
@@ -13,8 +14,8 @@ export const PositionSchema = z.object({
   purchasePrice: z.number().positive(),
   marketPrice: z.number().positive(),
   quantity: z.number().positive(),
-  issuingCountry: z.string().min(1).max(100),
-  producer: z.string().min(1).max(100),
+  issuingCountry: CountryEnumSchema,
+  producer: ProducerEnumSchema,
   certifiedProvenance: z.boolean(),
   status: PositionStatusSchema,
   closedDate: z.string().datetime().optional(),
@@ -29,8 +30,8 @@ export const PositionCreateRequestSchema = z.object({
   purchaseDate: z.string().datetime(),
   purchasePrice: z.number().min(0.01),
   quantity: z.number().min(0.001),
-  issuingCountry: z.string().min(1).max(100),
-  producer: z.string().min(1).max(100),
+  issuingCountry: CountryEnumSchema,
+  producer: ProducerEnumSchema,
   certifiedProvenance: z.boolean(),
   notes: z.string().max(1000).optional(),
 });
@@ -102,8 +103,8 @@ export const PositionQueryParamsSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(20).optional(),
   status: PositionStatusSchema.optional(),
-  metal: z.enum(['gold', 'silver', 'platinum', 'palladium']).optional(),
-  producer: z.string().optional(),
+  metal: MetalEnumSchema.optional(),
+  producer: ProducerEnumSchema.optional(),
 });
 
 export const TransactionQueryParamsSchema = z.object({

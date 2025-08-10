@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { Metal, ProductType, Country, Currency, Producer } from '../enums';
+import { Metal, ProductType, Country, Currency, Producer, OrderType, OrderStatus } from '../enums';
 
 // Enum validation schemas using class-based enums
 export const MetalEnumSchema = z.string().refine(
@@ -60,6 +60,24 @@ export const ProducerEnumSchema = z.string().refine(
   }
 );
 
+export const OrderTypeEnumSchema = z.string().refine(
+  (value) => OrderType.values().some((orderType: OrderType) => 
+    orderType.value.toLowerCase() === value.toLowerCase()
+  ),
+  {
+    message: "Invalid order type. Must be one of: " + OrderType.values().map((ot: OrderType) => ot.value).join(', ')
+  }
+);
+
+export const OrderStatusEnumSchema = z.string().refine(
+  (value) => OrderStatus.values().some((orderStatus: OrderStatus) => 
+    orderStatus.value.toLowerCase() === value.toLowerCase()
+  ),
+  {
+    message: "Invalid order status. Must be one of: " + OrderStatus.values().map((os: OrderStatus) => os.value).join(', ')
+  }
+);
+
 // Helper functions to get enum instances
 export const getMetalByValue = (value: string): Metal | undefined => {
   return Metal.values().find((metal: Metal) => 
@@ -97,5 +115,17 @@ export const getProducerByValue = (value: string): Producer | undefined => {
   );
 };
 
+export const getOrderTypeByValue = (value: string): OrderType | undefined => {
+  return OrderType.values().find((orderType: OrderType) => 
+    orderType.value.toLowerCase() === value.toLowerCase()
+  );
+};
+
+export const getOrderStatusByValue = (value: string): OrderStatus | undefined => {
+  return OrderStatus.values().find((orderStatus: OrderStatus) => 
+    orderStatus.value.toLowerCase() === value.toLowerCase()
+  );
+};
+
 // Export all enum classes for convenience
-export { Metal, ProductType, Country, Currency, Producer };
+export { Metal, ProductType, Country, Currency, Producer, OrderType, OrderStatus };
