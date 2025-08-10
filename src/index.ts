@@ -14,6 +14,7 @@ export * from './contracts/product-api';
 export * from './contracts/portfolio-api';
 export * from './contracts/payment-api';
 export * from './contracts/reference-data-api';
+export * from './contracts/custody-api';
 
 // =============================================================================
 // CORE TYPES - Export everything from all type modules
@@ -45,6 +46,9 @@ export { Currency as CurrencyEnum } from './enums/currency';
 export { Producer } from './enums/producer';
 export { OrderType } from './enums/order-type';
 export { OrderStatus } from './enums/order-status';
+export { Custodian } from './enums/custodian';
+export { PaymentFrequency } from './enums/payment-frequency';
+export { CustodyServiceType } from './enums/custody-service-type';
 
 // =============================================================================
 // VALIDATION SCHEMAS - Export everything from all validation modules
@@ -63,6 +67,13 @@ export {
   OrderTypeEnumSchema,
   OrderStatusEnumSchema
 } from './validation/enum-schemas';
+
+// Custody validation schemas - Export with explicit naming
+export {
+  CustodianEnumSchema,
+  PaymentFrequencyEnumSchema,
+  CustodyServiceTypeEnumSchema
+} from './validation/custody-schemas';
 
 // Payment validation schemas - Export schemas AND explicitly export all Zod-inferred types
 export {
@@ -150,6 +161,12 @@ export {
   type RetrievePaymentIntentResponseType,
   type PaymentWebhookEventType
 } from './validation/payment-schemas';
+
+// =============================================================================
+// SCHEMAS - Export custody-specific schemas
+// =============================================================================
+export * from './schemas/custody';
+export * from './schemas/custody-api';
 
 // =============================================================================
 // API CONTRACTS - Export EVERYTHING from all contract modules explicitly
