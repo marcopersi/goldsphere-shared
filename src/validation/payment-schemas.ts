@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CurrencySchema } from './currency-schemas';
+import { CurrencyEnumSchema } from './enum-schemas';
 
 // Enums and Constants
 export const PaymentMethodTypeSchema = z.enum(['card', 'bank_transfer', 'sepa_debit']);
@@ -28,8 +28,8 @@ export const PaymentMethodSchema = z.object({
   bankName: z.string().optional(),
   accountLast4: z.string().length(4).optional(),
   // Timestamps
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime()
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date()
 }).refine(
   (data) => {
     if (data.type === 'card') {
@@ -50,15 +50,15 @@ export const PaymentIntentSchema = z.object({
   id: z.string().min(1, 'Payment intent ID is required'),
   clientSecret: z.string().min(1, 'Client secret is required'),
   amount: z.number().int().positive('Amount must be positive'),
-  currency: CurrencySchema,
+  currency: CurrencyEnumSchema,
   status: PaymentIntentStatusSchema,
   orderId: z.string().optional(),
   customerId: z.string().optional(),
   paymentMethodId: z.string().optional(),
   metadata: z.record(z.string()).optional(),
   // Timestamps
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
   // Payment details
   amountReceived: z.number().int().nonnegative().optional(),
   fees: z.number().int().nonnegative().optional(),
@@ -77,7 +77,7 @@ export const PaymentErrorSchema = z.object({
 // Request Schemas
 export const CreatePaymentIntentRequestSchema = z.object({
   amount: z.number().int().positive('Amount must be positive'),
-  currency: CurrencySchema,
+  currency: CurrencyEnumSchema,
   orderId: z.string().min(1, 'Order ID is required'),
   customerId: z.string().optional(),
   paymentMethodId: z.string().optional(),
@@ -145,10 +145,10 @@ export const RefundResponseSchema = z.object({
   refund: z.object({
     id: z.string(),
     amount: z.number().int().nonnegative(),
-    currency: CurrencySchema,
+    currency: CurrencyEnumSchema,
     status: z.enum(['pending', 'succeeded', 'failed', 'canceled']),
     reason: z.string().optional(),
-    createdAt: z.string().datetime()
+    createdAt: z.coerce.date()
   }).optional(),
   error: PaymentErrorSchema.optional()
 });
@@ -172,7 +172,7 @@ export const PaymentWebhookEventSchema = z.object({
   data: z.object({
     object: z.union([PaymentIntentSchema, PaymentMethodSchema])
   }),
-  createdAt: z.string().datetime(),
+  createdAt: z.coerce.date(),
   livemode: z.boolean()
 });
 

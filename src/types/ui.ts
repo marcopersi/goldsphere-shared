@@ -1,5 +1,6 @@
 // UI Component Types
-import { Currency, ApiMode } from './common';
+import { ApiMode } from './common';
+import { Country, Currency, Metal } from '../enums';
 
 export type ToastVariant = 
   | "default"
@@ -22,9 +23,8 @@ export interface ProductDisplayType {
   fineness: number;
   producer: string;
   type: string;
-  country: string;
-  countryCode: string;
-  metal: string;
+  country: Country;
+  metal: Metal;
 }
 
 // Re-export ApiMode from common for backward compatibility

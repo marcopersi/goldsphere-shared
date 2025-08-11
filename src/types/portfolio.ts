@@ -6,7 +6,7 @@ export interface Position {
   id: string;
   userId: string;
   productId: string;
-  purchaseDate: string; // ISO date string
+  purchaseDate: Date; // ISO date string
   purchasePrice: number;
   marketPrice: number;
   quantity: number;
@@ -14,10 +14,10 @@ export interface Position {
   producer: Producer;
   certifiedProvenance: boolean;
   status: "active" | "closed";
-  closedDate?: string; // ISO date string
+  closedDate?: Date; // ISO date string
   notes?: string;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  createdAt: Date; // ISO date string
+  updatedAt: Date; // ISO date string
 }
 
 export interface Transaction {
@@ -25,12 +25,12 @@ export interface Transaction {
   positionId: string;
   userId: string;
   type: "buy" | "sell";
-  date: string; // ISO date string
+  date: Date; // ISO date string
   quantity: number;
   price: number;
   fees: number;
   notes?: string;
-  createdAt: string; // ISO date string
+  createdAt: Date; // ISO date string
 }
 
 export interface TransactionHistoryItem extends Transaction {
@@ -41,7 +41,7 @@ export interface TransactionHistoryItem extends Transaction {
 // Request/Response types
 export interface PositionCreateRequest {
   productId: string;
-  purchaseDate: string;
+  purchaseDate: Date;
   purchasePrice: number;
   quantity: number;
   issuingCountry: Country;
@@ -60,7 +60,7 @@ export interface PositionUpdateRequest {
 export interface TransactionCreateRequest {
   positionId: string;
   type: "buy" | "sell";
-  date: string;
+  date: Date;
   quantity: number;
   price: number;
   fees?: number;
@@ -104,8 +104,8 @@ export interface TransactionQueryParams {
   limit?: number;
   type?: "buy" | "sell";
   positionId?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 // Response types

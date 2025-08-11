@@ -36,8 +36,8 @@ export const ProductSchema = z.object({
   minimumOrderQuantity: z.number().int().min(1),
   premiumPercentage: z.number().min(0).optional(),
   tags: z.array(z.string()).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 // Product Registration schema

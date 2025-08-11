@@ -22,8 +22,8 @@ export interface Product {
   minimumOrderQuantity: number;
   premiumPercentage?: number;
   tags?: string[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ProductRegistrationRequest {
