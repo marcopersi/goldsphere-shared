@@ -28,8 +28,8 @@ export interface Order {
     estimatedDelivery: string;
   };
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface OrderItem {
@@ -98,7 +98,7 @@ export interface Quote {
     premium: number;
     volatility: 'low' | 'medium' | 'high';
   };
-  createdAt: string;
+  createdAt: Date;
 }
 
 export interface MetalPrice {
@@ -139,8 +139,8 @@ export interface OrderQueryParams {
   limit?: number;
   status?: OrderStatus;
   type?: OrderType;
-  startDate?: string;
-  endDate?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 export interface PriceQueryParams {

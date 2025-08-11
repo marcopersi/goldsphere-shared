@@ -10,7 +10,7 @@ export const PositionSchema = z.object({
   id: z.string().min(1),
   userId: z.string().min(1),
   productId: z.string().min(1),
-  purchaseDate: z.string().datetime(),
+  purchaseDate: z.coerce.date(),
   purchasePrice: z.number().positive(),
   marketPrice: z.number().positive(),
   quantity: z.number().positive(),
@@ -18,16 +18,16 @@ export const PositionSchema = z.object({
   producer: ProducerEnumSchema,
   certifiedProvenance: z.boolean(),
   status: PositionStatusSchema,
-  closedDate: z.string().datetime().optional(),
+  closedDate: z.coerce.date().optional(),
   notes: z.string().max(1000).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 // Position creation schema
 export const PositionCreateRequestSchema = z.object({
   productId: z.string().min(1),
-  purchaseDate: z.string().datetime(),
+  purchaseDate: z.coerce.date(),
   purchasePrice: z.number().min(0.01),
   quantity: z.number().min(0.001),
   issuingCountry: CountryEnumSchema,
@@ -50,19 +50,19 @@ export const TransactionSchema = z.object({
   positionId: z.string().min(1),
   userId: z.string().min(1),
   type: TransactionTypeSchema,
-  date: z.string().datetime(),
+  date: z.coerce.date(),
   quantity: z.number().min(0.001),
   price: z.number().min(0.01),
   fees: z.number().min(0).default(0),
   notes: z.string().max(500).optional(),
-  createdAt: z.string().datetime(),
+  createdAt: z.coerce.date(),
 });
 
 // Transaction creation schema
 export const TransactionCreateRequestSchema = z.object({
   positionId: z.string().min(1),
   type: TransactionTypeSchema,
-  date: z.string().datetime(),
+  date: z.coerce.date(),
   quantity: z.number().min(0.001),
   price: z.number().min(0.01),
   fees: z.number().min(0).default(0),
@@ -95,7 +95,7 @@ export const PortfolioSummarySchema = z.object({
     platinum: MetalBreakdownSchema.optional(),
     palladium: MetalBreakdownSchema.optional(),
   }),
-  lastUpdated: z.string().datetime(),
+  lastUpdated: z.coerce.date(),
 });
 
 // Query parameters schemas

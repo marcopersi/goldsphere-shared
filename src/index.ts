@@ -56,7 +56,6 @@ export { CustodyServiceType } from './enums/custody-service-type';
 // =============================================================================
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
-export * from './validation/currency-schemas';
 export * from './validation/order-schemas';
 
 // Enum validation schemas - Export with explicit naming

@@ -3,13 +3,14 @@
  */
 
 import { 
-  Currency, 
   PaymentMethodType, 
   PaginationParams,
   BaseProviderConfig,
   BaseApiConfig,
   Timestamps
 } from './common';
+
+import {Currency} from '../enums';
 
 // Payment-specific types
 export type PaymentIntentStatus = 
@@ -136,7 +137,7 @@ export interface RefundResponse {
     currency: Currency;
     status: 'pending' | 'succeeded' | 'failed' | 'canceled';
     reason?: string;
-    createdAt: string;
+    createdAt: Date;
   };
   error?: PaymentError;
 }
