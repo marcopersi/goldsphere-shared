@@ -1,11 +1,13 @@
 import { Pagination } from './common';
 import { Metal, Country, Producer } from '../enums';
+import { Product } from './products';
 
 // Core entities
 export interface Position {
   id: string;
   userId: string;
   productId: string;
+  product: Product;
   purchaseDate: Date; // ISO date string
   purchasePrice: number;
   marketPrice: number;

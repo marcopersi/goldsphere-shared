@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CountryEnumSchema, ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
+import { ProductSchema } from './product-schemas';
 
 // Enum schemas
 export const PositionStatusSchema = z.enum(['active', 'closed']);
@@ -10,6 +11,7 @@ export const PositionSchema = z.object({
   id: z.string().min(1),
   userId: z.string().min(1),
   productId: z.string().min(1),
+  product: ProductSchema,
   purchaseDate: z.coerce.date(),
   purchasePrice: z.number().positive(),
   marketPrice: z.number().positive(),
