@@ -21,7 +21,7 @@ import {
   CustodyServicesResponseSchema,
   CustodyAssignmentResponseSchema,
   CustodyAssignmentsResponseSchema
-} from '../schemas/custody-api';
+} from '../validation/custody-api-schemas';
 
 // Custodian endpoints
 export const custodyApiContract = {

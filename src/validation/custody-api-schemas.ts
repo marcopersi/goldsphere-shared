@@ -5,8 +5,8 @@
  */
 
 import { z } from 'zod';
-import { CustodianSchema, CustodyServiceSchema, CustodyAssignmentSchema } from './custody';
-import { PaginationSchema } from './common';
+import { CustodianSchema, CustodyServiceSchema, CustodyAssignmentSchema } from './custody-schemas';
+import { PaginationSchema } from './common-schemas';
 
 // Request Schemas
 export const CreateCustodianRequestSchema = z.object({
