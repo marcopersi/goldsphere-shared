@@ -5,10 +5,9 @@
  */
 
 import { z } from 'zod';
-import { OrderSchema, AddressSchema, OrderFeesSchema, OrderItemSchema } from './orders';
-import { PaginationSchema } from './common';
-import { OrderTypeEnumSchema, OrderStatusEnumSchema, CurrencyEnumSchema } from '../validation/enum-schemas';
-import { isValidStatusTransition } from '../validation/order-schemas';
+import { OrderSchema, AddressSchema, OrderFeesSchema, OrderItemSchema, isValidStatusTransition } from './order-schemas';
+import { PaginationSchema } from './common-schemas';
+import { OrderTypeEnumSchema, OrderStatusEnumSchema, CurrencyEnumSchema } from './enum-schemas';
 
 // ============================================================================= 
 // REQUEST SCHEMAS
@@ -63,7 +62,7 @@ export const ProcessOrderRequestSchema = z.object({
   tracking: z.object({
     trackingNumber: z.string().optional(),
     carrier: z.string().optional(),
-    estimatedDelivery: z.string().datetime().optional()
+    estimatedDelivery: z.coerce.date().optional()
   }).optional()
 });
 
@@ -149,8 +148,8 @@ export const OrderStatsResponseSchema = z.object({
       totalValue: z.number()
     })),
     period: z.object({
-      startDate: z.string().datetime(),
-      endDate: z.string().datetime()
+      startDate: z.coerce.date(),
+      endDate: z.coerce.date()
     })
   })
 });
@@ -182,8 +181,8 @@ export const OrderQueryParamsSchema = z.object({
 export const OrdersQuerySchema = OrderQueryParamsSchema;
 
 export const OrderStatsQuerySchema = z.object({
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
   groupBy: z.enum(['day', 'week', 'month']).default('day'),
   currency: z.string().length(3).optional(),
   status: z.string().optional(),

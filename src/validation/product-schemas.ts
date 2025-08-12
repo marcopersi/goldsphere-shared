@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MetalEnumSchema, ProductTypeEnumSchema, CountryEnumSchema, CurrencyEnumSchema, ProducerEnumSchema } from './enum-schemas';
+import { PaginationSchema } from './common-schemas';
 
 // Enum schemas - Updated to use class-based enums
 export const ProductTypeSchema = ProductTypeEnumSchema;
@@ -82,16 +83,6 @@ export const ProductQueryParamsSchema = z.object({
   metal: MetalTypeSchema.optional(),
   type: ProductTypeSchema.optional(),
   producer: ProducerEnumSchema.optional(),
-});
-
-// Pagination schema
-export const PaginationSchema = z.object({
-  page: z.number().int(),
-  limit: z.number().int(),
-  total: z.number().int(),
-  totalPages: z.number().int(),
-  hasNext: z.boolean(),
-  hasPrev: z.boolean(),
 });
 
 // Products response schema

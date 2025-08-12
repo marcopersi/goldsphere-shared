@@ -19,7 +19,7 @@ import {
   OrdersResponseSchema,
   OrderCalculationResponseSchema,
   OrderStatsResponseSchema
-} from '../schemas/orders-api';
+} from '../validation/order-api-schemas';
 
 // Order Management endpoints
 export const orderApiContract = {

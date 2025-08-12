@@ -173,11 +173,11 @@ export {
 } from './validation/payment-schemas';
 
 // =============================================================================
-// SCHEMAS - Export custody and order schemas (avoiding conflicts)
+// SCHEMAS - Export validation schemas
 // =============================================================================
-export * from './schemas/custody';
-export * from './schemas/custody-api';
-export * from './schemas/orders';
+export * from './validation/custody-schemas';
+export * from './validation/custody-api-schemas';
+export * from './validation/order-schemas';
 
 // Export order-api schemas with explicit naming to avoid conflicts
 export {
@@ -205,7 +205,7 @@ export {
   type OrderQueryParams as OrderApiQueryParams,
   type OrderCalculationResponse as OrderApiCalculationResponse,
   type OrderStatsResponse as OrderApiStatsResponse
-} from './schemas/orders-api';
+} from './validation/order-api-schemas';
 
 // =============================================================================
 // API CONTRACTS - Export EVERYTHING from all contract modules explicitly
