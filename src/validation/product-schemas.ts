@@ -87,8 +87,11 @@ export const ProductQueryParamsSchema = z.object({
 
 // Products response schema
 export const ProductsResponseSchema = z.object({
-  products: z.array(ProductSchema),
-  pagination: PaginationSchema,
+  success: z.boolean(),
+  data: z.object({
+    products: z.array(ProductSchema),
+    pagination: PaginationSchema,
+  }),
 });
 
 // Bulk registration schemas
