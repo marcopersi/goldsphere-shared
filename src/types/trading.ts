@@ -1,5 +1,5 @@
 // Trading API Types
-import { Pagination, PaymentMethodType, Address } from './common';
+import { PaginationInfo, PaymentMethodType, Address } from './common';
 import { Metal, Currency, OrderType, OrderStatus } from '../enums';
 
 export interface Order {
@@ -62,7 +62,42 @@ export interface OrderUpdateRequest {
 
 export interface OrdersResponse {
   orders: Order[];
-  pagination: Pagination;
+  pagination: PaginationInfo;
+  user?: {
+    id: string;
+  };
+}
+
+export interface AdminOrdersResponse {
+  orders: Order[];
+  pagination: PaginationInfo;
+  statistics: {
+    totalOrders: number;
+    pendingOrders: number;
+    completedOrders: number;
+    cancelledOrders: number;
+    uniqueUsers: number;
+  };
+  filters: {
+    status?: string;
+    type?: string;
+    userId?: string;
+  };
+  adminContext: {
+    requestedBy: string;
+    role: string;
+  };
+}
+
+export interface SmartOrdersResponse {
+  orders: Order[];
+  pagination: PaginationInfo;
+  context: {
+    requestedBy: string;
+    viewingOrdersFor: string;
+    endpointType: string;
+    suggestion?: string;
+  };
 }
 
 export interface QuoteRequest {

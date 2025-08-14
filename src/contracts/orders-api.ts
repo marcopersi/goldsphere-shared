@@ -17,6 +17,8 @@ import {
   CalculateOrderRequestSchema,
   OrderResponseSchema,
   OrdersResponseSchema,
+  AdminOrdersResponseSchema,
+  SmartOrdersResponseSchema,
   OrderCalculationResponseSchema,
   OrderStatsResponseSchema
 } from '../validation/order-api-schemas';
@@ -31,6 +33,26 @@ export const orderApiContract = {
       query: OrdersQuerySchema,
       responses: {
         200: OrdersResponseSchema
+      }
+    },
+    
+    // GET /admin/orders
+    adminList: {
+      method: 'GET' as const,
+      path: '/admin/orders',
+      query: OrdersQuerySchema,
+      responses: {
+        200: AdminOrdersResponseSchema
+      }
+    },
+    
+    // GET /smart/orders
+    smartList: {
+      method: 'GET' as const,
+      path: '/smart/orders',
+      query: OrdersQuerySchema,
+      responses: {
+        200: SmartOrdersResponseSchema
       }
     },
     
