@@ -180,6 +180,45 @@ export * from './validation/custody-schemas';
 export * from './validation/custody-api-schemas';
 export * from './validation/order-schemas';
 
+// Reference data schemas - Export with explicit naming to avoid conflicts with contracts
+export {
+  MetalReferenceSchema,
+  ProductTypeReferenceSchema,
+  CountryReferenceSchema,
+  CurrencyReferenceSchema,
+  ProducerReferenceSchema,
+  CustodianReferenceSchema,
+  PaymentFrequencyReferenceSchema,
+  CustodyServiceTypeReferenceSchema,
+  MetalsResponseSchema as RefDataMetalsResponseSchema,
+  CountriesResponseSchema as RefDataCountriesResponseSchema,
+  CurrenciesResponseSchema as RefDataCurrenciesResponseSchema,
+  ProductTypesResponseSchema as RefDataProductTypesResponseSchema,
+  ProducersResponseSchema as RefDataProducersResponseSchema,
+  CustodiansResponseSchema as RefDataCustodiansResponseSchema,
+  PaymentFrequenciesResponseSchema as RefDataPaymentFrequenciesResponseSchema,
+  CustodyServiceTypesResponseSchema as RefDataCustodyServiceTypesResponseSchema,
+  ReferenceDataResponseSchema as RefDataResponseSchema,
+  // Export types with explicit naming to avoid conflicts
+  type MetalReference as RefDataMetalReference,
+  type ProductTypeReference as RefDataProductTypeReference,
+  type CountryReference as RefDataCountryReference,
+  type CurrencyReference as RefDataCurrencyReference,
+  type ProducerReference as RefDataProducerReference,
+  type CustodianReference as RefDataCustodianReference,
+  type PaymentFrequencyReference as RefDataPaymentFrequencyReference,
+  type CustodyServiceTypeReference as RefDataCustodyServiceTypeReference,
+  type ReferenceDataResponse as RefDataResponse,
+  type MetalsResponse as RefDataMetalsResponse,
+  type ProductTypesResponse as RefDataProductTypesResponse,
+  type CountriesResponse as RefDataCountriesResponse,
+  type CurrenciesResponse as RefDataCurrenciesResponse,
+  type ProducersResponse as RefDataProducersResponse,
+  type CustodiansResponse as RefDataCustodiansResponse,
+  type PaymentFrequenciesResponse as RefDataPaymentFrequenciesResponse,
+  type CustodyServiceTypesResponse as RefDataCustodyServiceTypesResponse
+} from './validation/reference-data-schemas';
+
 // Export order-api schemas with explicit naming to avoid conflicts
 export {
   CreateOrderRequestSchema,
@@ -289,4 +328,4 @@ export { z } from 'zod';
 // =============================================================================
 // PACKAGE METADATA
 // =============================================================================
-export const GOLDSPHERE_SHARED_VERSION = '1.3.1';
+export const GOLDSPHERE_SHARED_VERSION = '1.3.2';
