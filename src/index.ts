@@ -54,6 +54,7 @@ export { CustodyServiceType } from './enums/custody-service-type';
 // =============================================================================
 // VALIDATION SCHEMAS - Export everything from all validation modules
 // =============================================================================
+export * from './validation/common-schemas';
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
 export * from './validation/order-schemas';
@@ -288,4 +289,4 @@ export { z } from 'zod';
 // =============================================================================
 // PACKAGE METADATA
 // =============================================================================
-export const GOLDSPHERE_SHARED_VERSION = '1.0.7';
+export const GOLDSPHERE_SHARED_VERSION = '1.3.1';
