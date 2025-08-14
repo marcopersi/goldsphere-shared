@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { CountryEnumSchema, ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
 import { PaymentFrequencyEnumSchema } from './custody-schemas';
 import { ProductSchema } from './product-schemas';
+import { PaginationSchema } from './common-schemas';
 
 // Enum schemas
 export const PositionStatusSchema = z.enum(['active', 'closed']);
@@ -139,26 +140,12 @@ export const TransactionQueryParamsSchema = z.object({
 // Response schemas
 export const PositionsResponseSchema = z.object({
   positions: z.array(PositionSchema),
-  pagination: z.object({
-    page: z.number().int(),
-    limit: z.number().int(),
-    total: z.number().int(),
-    totalPages: z.number().int(),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean(),
-  }),
+  pagination: PaginationSchema,
 });
 
 export const TransactionsResponseSchema = z.object({
   transactions: z.array(TransactionHistoryItemSchema),
-  pagination: z.object({
-    page: z.number().int(),
-    limit: z.number().int(),
-    total: z.number().int(),
-    totalPages: z.number().int(),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean(),
-  }),
+  pagination: PaginationSchema,
 });
 
 // Export types derived from schemas
