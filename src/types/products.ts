@@ -1,4 +1,4 @@
-import { WeightUnit, Pagination } from './common';
+import { WeightUnit, PaginationInfo } from './common';
 import { Metal, ProductType, Country, Currency, Producer } from '../enums';
 
 export interface Product {
@@ -60,8 +60,11 @@ export interface ProductUpdateRequest {
 }
 
 export interface ProductsResponse {
-  products: Product[];
-  pagination: Pagination;
+  success: boolean;
+  data: {
+    products: Product[];
+    pagination: PaginationInfo;
+  };
 }
 
 export interface BulkRegistrationRequest {
