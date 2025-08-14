@@ -46,7 +46,7 @@ export interface PaginationParams {
 /**
  * Standard pagination metadata
  */
-export interface Pagination {
+export interface PaginationInfo {
   page: number;
   limit: number;
   total: number;
@@ -54,6 +54,9 @@ export interface Pagination {
   hasNext: boolean;
   hasPrev: boolean;
 }
+
+// Legacy alias for backward compatibility
+export type Pagination = PaginationInfo;
 
 /**
  * Alternative pagination for cursor-based pagination
@@ -70,7 +73,7 @@ export interface CursorPagination {
  */
 export interface PaginatedResponse<T> {
   data: T[];
-  pagination: Pagination;
+  pagination: PaginationInfo;
 }
 
 /**

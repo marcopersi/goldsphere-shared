@@ -1,4 +1,4 @@
-import { Pagination } from './common';
+import { PaginationInfo } from './common';
 import { Metal, Country, Producer, PaymentFrequency } from '../enums';
 import { Product } from './products';
 
@@ -127,10 +127,10 @@ export interface TransactionQueryParams {
 // Response types
 export interface PositionsResponse {
   positions: Position[];
-  pagination: Pagination;
+  pagination: PaginationInfo;
 }
 
 export interface TransactionsResponse {
   transactions: TransactionHistoryItem[];
-  pagination: Pagination;
+  pagination: PaginationInfo;
 }
