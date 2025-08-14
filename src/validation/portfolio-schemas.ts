@@ -1,10 +1,21 @@
 import { z } from 'zod';
 import { CountryEnumSchema, ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
+import { PaymentFrequencyEnumSchema } from './custody-schemas';
 import { ProductSchema } from './product-schemas';
 
 // Enum schemas
 export const PositionStatusSchema = z.enum(['active', 'closed']);
 export const TransactionTypeSchema = z.enum(['buy', 'sell']);
+
+// Custody details schema for Position
+export const PositionCustodySchema = z.object({
+  custodyServiceId: z.string().min(1),
+  custodyServiceName: z.string().min(1),
+  custodianId: z.string().min(1),
+  custodianName: z.string().min(1),
+  fee: z.number().min(0),
+  paymentFrequency: PaymentFrequencyEnumSchema,
+});
 
 // Core Position schema
 export const PositionSchema = z.object({
@@ -22,6 +33,11 @@ export const PositionSchema = z.object({
   status: PositionStatusSchema,
   closedDate: z.coerce.date().optional(),
   notes: z.string().max(1000).optional(),
+  
+  // Custody fields
+  custodyServiceId: z.string().min(1).optional(),
+  custody: PositionCustodySchema.optional(),
+  
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -36,6 +52,7 @@ export const PositionCreateRequestSchema = z.object({
   producer: ProducerEnumSchema,
   certifiedProvenance: z.boolean(),
   notes: z.string().max(1000).optional(),
+  custodyServiceId: z.string().min(1), // Required for position creation
 });
 
 // Position update schema
@@ -44,6 +61,7 @@ export const PositionUpdateRequestSchema = z.object({
   quantity: z.number().min(0.001).optional(),
   notes: z.string().max(1000).optional(),
   status: PositionStatusSchema.optional(),
+  custodyServiceId: z.string().min(1).optional(),
 });
 
 // Transaction schema
@@ -145,6 +163,7 @@ export const TransactionsResponseSchema = z.object({
 
 // Export types derived from schemas
 export type PositionSchemaType = z.infer<typeof PositionSchema>;
+export type PositionCustodySchemaType = z.infer<typeof PositionCustodySchema>;
 export type PositionCreateRequestSchemaType = z.infer<typeof PositionCreateRequestSchema>;
 export type PositionUpdateRequestSchemaType = z.infer<typeof PositionUpdateRequestSchema>;
 export type TransactionSchemaType = z.infer<typeof TransactionSchema>;
