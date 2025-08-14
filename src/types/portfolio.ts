@@ -1,5 +1,5 @@
 import { Pagination } from './common';
-import { Metal, Country, Producer } from '../enums';
+import { Metal, Country, Producer, PaymentFrequency } from '../enums';
 import { Product } from './products';
 
 // Core entities
@@ -18,6 +18,18 @@ export interface Position {
   status: "active" | "closed";
   closedDate?: Date; // ISO date string
   notes?: string;
+  
+  // Custody fields
+  custodyServiceId?: string;
+  custody?: {
+    custodyServiceId: string;
+    custodyServiceName: string;
+    custodianId: string;
+    custodianName: string;
+    fee: number;
+    paymentFrequency: PaymentFrequency;
+  };
+  
   createdAt: Date; // ISO date string
   updatedAt: Date; // ISO date string
 }
@@ -50,6 +62,7 @@ export interface PositionCreateRequest {
   producer: Producer;
   certifiedProvenance: boolean;
   notes?: string;
+  custodyServiceId: string; // Required for position creation
 }
 
 export interface PositionUpdateRequest {
@@ -57,6 +70,7 @@ export interface PositionUpdateRequest {
   quantity?: number;
   notes?: string;
   status?: "active" | "closed";
+  custodyServiceId?: string;
 }
 
 export interface TransactionCreateRequest {
