@@ -63,7 +63,6 @@ export interface ReferenceDataResponse {
     paymentFrequencies: PaymentFrequencyReference[];
     custodyServiceTypes: CustodyServiceTypeReference[];
   };
-  error?: string;
 }
 
 // Specific reference data responses for individual endpoints
