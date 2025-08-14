@@ -96,10 +96,42 @@ export const OrderResponseSchema = z.object({
 
 // Multiple orders response (paginated)
 export const OrdersResponseSchema = z.object({
-  success: z.boolean(),
-  data: z.object({
-    orders: z.array(OrderSchema),
-    pagination: PaginationSchema
+  orders: z.array(OrderSchema),
+  pagination: PaginationSchema,
+  user: z.object({
+    id: z.string()
+  }).optional()
+});
+
+export const AdminOrdersResponseSchema = z.object({
+  orders: z.array(OrderSchema),
+  pagination: PaginationSchema,
+  statistics: z.object({
+    totalOrders: z.number().int(),
+    pendingOrders: z.number().int(),
+    completedOrders: z.number().int(),
+    cancelledOrders: z.number().int(),
+    uniqueUsers: z.number().int()
+  }),
+  filters: z.object({
+    status: z.string().optional(),
+    type: z.string().optional(),
+    userId: z.string().optional()
+  }),
+  adminContext: z.object({
+    requestedBy: z.string(),
+    role: z.string()
+  })
+});
+
+export const SmartOrdersResponseSchema = z.object({
+  orders: z.array(OrderSchema),
+  pagination: PaginationSchema,
+  context: z.object({
+    requestedBy: z.string(),
+    viewingOrdersFor: z.string(),
+    endpointType: z.string(),
+    suggestion: z.string().optional()
   })
 });
 
@@ -203,6 +235,8 @@ export type UpdateOrderRequest = z.infer<typeof UpdateOrderRequestSchema>;
 export type UpdateOrderStatusRequest = z.infer<typeof UpdateOrderStatusRequestSchema>;
 export type OrderResponse = z.infer<typeof OrderResponseSchema>;
 export type OrdersResponse = z.infer<typeof OrdersResponseSchema>;
+export type AdminOrdersResponse = z.infer<typeof AdminOrdersResponseSchema>;
+export type SmartOrdersResponse = z.infer<typeof SmartOrdersResponseSchema>;
 export type CreateOrderResponse = z.infer<typeof CreateOrderResponseSchema>;
 export type UpdateOrderResponse = z.infer<typeof UpdateOrderResponseSchema>;
 export type OrderQueryParams = z.infer<typeof OrderQueryParamsSchema>;
