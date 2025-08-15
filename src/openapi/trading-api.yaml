@@ -138,16 +138,102 @@ paths:
               schema:
                 type: object
                 properties:
-                  orders:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Order'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/calculate:
+    post:
+      summary: Calculate order totals
+      description: Calculate totals, fees, and taxes for a prospective order
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateOrderRequest'
+      responses:
+        '200':
+          description: Calculation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCalculationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/stats:
+    get:
+      summary: Get order statistics
+      description: Retrieve aggregated statistics for orders in a period
+      tags:
+        - Orders
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: groupBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+        - name: currency
+          in: query
+          required: false
+          schema:
+            type: string
+            example: USD
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -168,13 +254,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -214,15 +294,209 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderResponse'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/{orderId}/process:
+    post:
+      summary: Process order action
+      description: Perform a workflow action on an order (confirm, cancel, ship, deliver, complete)
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessOrderRequest'
+      responses:
+        '200':
+          description: Order processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Invalid status transition or action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/{orderId}/items:
+    post:
+      summary: Add order item
+      description: Add a new item to an existing order (allowed in certain statuses)
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddOrderItemRequest'
+      responses:
+        '200':
+          description: Item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be modified in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/{orderId}/items/{itemId}:
+    patch:
+      summary: Update order item
+      description: Update an item in an existing order (quantity or custody assignment)
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderItemRequest'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be modified in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Remove order item
+      description: Remove an item from an existing order
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Item removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be modified in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /orders/{orderId}/custody/assign:
+    post:
+      summary: Assign custody for order items
+      description: Assign custody services and custodians to order items
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCustodyRequest'
+      responses:
+        '200':
+          description: Custody assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Invalid assignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -250,13 +524,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -326,7 +594,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Quote'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -509,6 +783,14 @@ components:
       bearerFormat: JWT
 
   schemas:
+    OrderResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Order'
     Order:
       type: object
       required:
@@ -729,6 +1011,100 @@ components:
           maxLength: 500
           description: Order notes or special instructions
 
+    CalculateOrderRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [productId, quantity]
+            properties:
+              productId:
+                type: string
+                format: uuid
+              quantity:
+                type: number
+                minimum: 1
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingMethod:
+          type: string
+          enum: [standard, priority, express, pickup]
+        currency:
+          type: string
+          example: USD
+
+    ProcessOrderRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [confirm, cancel, ship, deliver, complete]
+        reason:
+          type: string
+        notes:
+          type: string
+        tracking:
+          type: object
+          properties:
+            trackingNumber:
+              type: string
+            carrier:
+              type: string
+            estimatedDelivery:
+              type: string
+              format: date-time
+
+    AssignCustodyRequest:
+      type: object
+      required: [assignments]
+      properties:
+        assignments:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, custodianId, custodyServiceId]
+            properties:
+              itemId:
+                type: string
+                format: uuid
+              custodianId:
+                type: string
+                format: uuid
+              custodyServiceId:
+                type: string
+                format: uuid
+
+    AddOrderItemRequest:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+          minimum: 1
+        custodyServiceId:
+          type: string
+          format: uuid
+
+    UpdateOrderItemRequest:
+      type: object
+      properties:
+        quantity:
+          type: number
+          minimum: 1
+        custodyServiceId:
+          type: string
+          format: uuid
+
     OrderUpdateRequest:
       type: object
       properties:
@@ -847,6 +1223,96 @@ components:
           type: string
           format: date-time
           example: "2024-08-07T10:30:00Z"
+
+    OrderCalculationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  productId:
+                    type: string
+                    format: uuid
+                  productName:
+                    type: string
+                  quantity:
+                    type: number
+                  unitPrice:
+                    type: number
+                  totalPrice:
+                    type: number
+            subtotal:
+              type: number
+            fees:
+              type: object
+              properties:
+                processing:
+                  type: number
+                shipping:
+                  type: number
+                insurance:
+                  type: number
+            taxes:
+              type: number
+            totalAmount:
+              type: number
+            currency:
+              type: string
+
+    OrderStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalOrders:
+              type: number
+            totalValue:
+              type: number
+            averageOrderValue:
+              type: number
+            ordersByStatus:
+              type: object
+              additionalProperties:
+                type: number
+            ordersByType:
+              type: object
+              additionalProperties:
+                type: number
+            topProducts:
+              type: array
+              items:
+                type: object
+                properties:
+                  productId:
+                    type: string
+                    format: uuid
+                  productName:
+                    type: string
+                  quantity:
+                    type: number
+                  totalValue:
+                    type: number
+            period:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
 
     MetalPrice:
       type: object
@@ -1115,7 +1581,7 @@ components:
         hasNext:
           type: boolean
           example: true
-  hasPrevious:
+        hasPrevious:
           type: boolean
           example: false
 

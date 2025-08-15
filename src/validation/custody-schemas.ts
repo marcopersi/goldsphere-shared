@@ -421,7 +421,7 @@ export const CustodyServiceType = custodyServiceTypeEnum;
 // =============================================================================
 
 export type CustodianType = z.infer<typeof CustodianSchema>;
-export type CustodyServiceType = z.infer<typeof CustodyServiceSchema>;
+export type CustodyService = z.infer<typeof CustodyServiceSchema>;
 export type ExtendedCustodianType = z.infer<typeof ExtendedCustodianSchema>;
 export type ExtendedCustodyServiceType = z.infer<typeof ExtendedCustodyServiceSchema>;
 export type CustodyAssignmentType = z.infer<typeof CustodyAssignmentSchema>;
