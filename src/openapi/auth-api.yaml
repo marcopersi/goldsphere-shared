@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: GoldSphere Auth API
+  version: 1.0.0
+  description: Authentication endpoints for the GoldSphere platform
+servers:
+  - url: https://api.goldsphere.example.com
+    description: Production server
+  - url: http://localhost:3000
+    description: Local server
+paths:
+  /auth/login:
+    post:
+      summary: Log in with username/password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+  /auth/logout:
+    post:
+      summary: Log out
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
+    AuthError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        code:
+          type: string
+      required: [success, error]
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+            expiresIn:
+              type: integer
+          required: [accessToken, refreshToken, expiresIn]
+      required: [success, data]
+    RefreshResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+            expiresIn:
+              type: integer
+          required: [accessToken, expiresIn]
+      required: [success, data]
