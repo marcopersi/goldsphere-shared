@@ -715,7 +715,7 @@ components:
         hasNext:
           type: boolean
           example: true
-        hasPrev:
+  hasPrevious:
           type: boolean
           example: false
 
