@@ -55,6 +55,12 @@ paths:
           schema:
             type: string
             enum: [buy, sell]
+        - name: userId
+          in: query
+          description: Filter by user ID
+          required: false
+          schema:
+            type: string
         - name: dateFrom
           in: query
           description: Filter orders from this date
@@ -69,6 +75,61 @@ paths:
           schema:
             type: string
             format: date
+        - name: minAmount
+          in: query
+          description: Minimum total order amount
+          required: false
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          description: Maximum total order amount
+          required: false
+          schema:
+            type: number
+        - name: currency
+          in: query
+          description: Filter by currency (ISO3)
+          required: false
+          schema:
+            type: string
+            example: USD
+        - name: search
+          in: query
+          description: Search by order number, customer name, etc.
+          required: false
+          schema:
+            type: string
+        - name: priority
+          in: query
+          description: Filter by priority
+          required: false
+          schema:
+            type: string
+            enum: [normal, high, urgent]
+        - name: source
+          in: query
+          description: Source of order
+          required: false
+          schema:
+            type: string
+            enum: [web, mobile, api, admin, phone]
+        - name: sortBy
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, totalAmount, orderNumber]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         '200':
           description: Successful response
@@ -100,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderRequest'
+              $ref: '#/components/schemas/CreateOrderInput'
       responses:
         '201':
           description: Order created successfully
@@ -112,11 +173,8 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  order:
+                  data:
                     $ref: '#/components/schemas/Order'
-                  message:
-                    type: string
-                    example: "Order placed successfully"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -156,7 +214,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Order'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -191,11 +255,8 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  order:
+                  data:
                     $ref: '#/components/schemas/Order'
-                  message:
-                    type: string
-                    example: "Order updated successfully"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -224,7 +285,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Order cancelled successfully
           content:
             application/json:
@@ -234,9 +295,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  message:
-                    type: string
-                    example: "Order cancelled successfully"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -523,23 +581,44 @@ components:
           properties:
             type:
               type: string
-              enum: [credit_card, bank_transfer, crypto, cash]
+              enum: [credit_card, bank_transfer, crypto, check, wire]
+            provider:
+              type: string
+              example: "stripe"
             last4:
               type: string
               example: "1234"
+            brand:
+              type: string
+              example: "visa"
+            expiryMonth:
+              type: integer
+              minimum: 1
+              maximum: 12
+              example: 12
+            expiryYear:
+              type: integer
+              example: 2030
+            verified:
+              type: boolean
+              default: false
         tracking:
           type: object
           properties:
-            carrier:
-              type: string
-              example: "UPS"
             trackingNumber:
               type: string
               example: "1Z999AA1234567890"
-            estimatedDelivery:
+            trackingUrl:
               type: string
-              format: date
-              example: "2024-08-15"
+              format: uri
+              example: "https://track.example.com/1Z999AA1234567890"
+            signatureRequired:
+              type: boolean
+              default: true
+        shippingMethod:
+          type: string
+          description: Shipping method selected for the order
+          enum: [standard, priority, express, pickup]
         notes:
           type: string
           description: Order notes or special instructions
@@ -555,11 +634,16 @@ components:
     OrderItem:
       type: object
       required:
+        - id
         - productId
         - quantity
         - unitPrice
         - totalPrice
       properties:
+        id:
+          type: string
+          description: Order item identifier
+          example: "f9a1b1b6-8a1c-4f13-9d5a-9f5f3c1a2b7e"
         productId:
           type: string
           description: Product identifier
@@ -581,17 +665,19 @@ components:
           type: number
           description: Total price for this item
           example: 4201.00
-        specifications:
-          type: object
-          description: Product specifications at time of order
-
-    OrderRequest:
+        custodyServiceId:
+          type: string
+          description: Custody Service identifier for this item
+          example: "5e8f7b2a-3c4d-4a5e-8f7b-2a3c4d5e8f7b"
+        certificateRequested:
+          type: boolean
+          description: Whether a certificate is requested for this item
+          default: false
+    CreateOrderInput:
       type: object
       required:
         - type
         - items
-        - shippingAddress
-        - paymentMethod
       properties:
         type:
           type: string
@@ -612,20 +698,32 @@ components:
                 type: integer
                 minimum: 1
                 description: Quantity to order
+              custodyServiceId:
+                type: string
+                description: Optional custody service identifier for this item
           minItems: 1
         shippingAddress:
           $ref: '#/components/schemas/Address'
         paymentMethod:
           type: object
-          required:
-            - type
           properties:
             type:
               type: string
-              enum: [credit_card, bank_transfer, crypto, cash]
-            details:
-              type: object
-              description: Payment method specific details
+              enum: [credit_card, bank_transfer, crypto, check, wire]
+            provider:
+              type: string
+            last4:
+              type: string
+            brand:
+              type: string
+            expiryMonth:
+              type: integer
+              minimum: 1
+              maximum: 12
+            expiryYear:
+              type: integer
+            verified:
+              type: boolean
         notes:
           type: string
           maxLength: 500
@@ -957,43 +1055,47 @@ components:
     Address:
       type: object
       required:
+        - type
         - firstName
         - lastName
         - street
         - city
-        - postalCode
+        - state
+        - zipCode
         - country
       properties:
+        type:
+          type: string
+          enum: [shipping, billing, both]
+          example: "shipping"
         firstName:
           type: string
           example: "John"
         lastName:
           type: string
           example: "Doe"
-        company:
-          type: string
-          example: "GoldSphere Inc."
         street:
           type: string
           example: "123 Gold Street"
-        street2:
-          type: string
-          example: "Suite 456"
         city:
           type: string
           example: "New York"
         state:
           type: string
           example: "NY"
-        postalCode:
+        zipCode:
           type: string
           example: "10001"
         country:
           type: string
-          example: "USA"
+          description: 2-letter ISO country code
+          example: "US"
         phone:
           type: string
           example: "+1-555-123-4567"
+        isDefault:
+          type: boolean
+          default: false
 
     Pagination:
       type: object
@@ -1013,7 +1115,7 @@ components:
         hasNext:
           type: boolean
           example: true
-        hasPrev:
+  hasPrevious:
           type: boolean
           example: false
 

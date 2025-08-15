@@ -86,6 +86,86 @@ paths:
           required: false
           schema:
             type: string
+        - name: search
+          in: query
+          description: Search by name, description, or tags
+          required: false
+          schema:
+            type: string
+        - name: metalId
+          in: query
+          description: Filter by metal ID (UUID)
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: productTypeId
+          in: query
+          description: Filter by product type ID (UUID)
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: producerId
+          in: query
+          description: Filter by producer ID (UUID)
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: issuingCountryId
+          in: query
+          description: Filter by issuing country ID (UUID)
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: inStock
+          in: query
+          description: Filter by stock availability
+          required: false
+          schema:
+            type: boolean
+        - name: minPrice
+          in: query
+          description: Minimum price filter
+          required: false
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          description: Maximum price filter
+          required: false
+          schema:
+            type: number
+        - name: year
+          in: query
+          description: Filter by production year
+          required: false
+          schema:
+            type: integer
+        - name: certifiedProvenance
+          in: query
+          description: Filter by certified provenance flag
+          required: false
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: Sort field
+          required: false
+          schema:
+            type: string
+            enum: [name, price, createdAt, updatedAt]
+            default: updatedAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         '200':
           description: Successful response
@@ -155,11 +235,8 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  product:
+                  data:
                     $ref: '#/components/schemas/Product'
-                  message:
-                    type: string
-                    example: "Product registered successfully"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -205,7 +282,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Product'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -250,11 +333,8 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  product:
+                  data:
                     $ref: '#/components/schemas/Product'
-                  message:
-                    type: string
-                    example: "Product updated successfully"
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -287,9 +367,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  message:
-                    type: string
-                    example: "Product deleted successfully"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -329,30 +406,33 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  results:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        product:
-                          $ref: '#/components/schemas/Product'
-                        status:
-                          type: string
-                          enum: [success, error]
-                        error:
-                          type: string
-                  summary:
+                  data:
                     type: object
                     properties:
-                      total:
-                        type: integer
-                        example: 10
-                      successful:
-                        type: integer
-                        example: 8
-                      failed:
-                        type: integer
-                        example: 2
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            product:
+                              $ref: '#/components/schemas/Product'
+                            status:
+                              type: string
+                              enum: [success, error]
+                            error:
+                              type: string
+                      summary:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 10
+                          successful:
+                            type: integer
+                            example: 8
+                          failed:
+                            type: integer
+                            example: 2
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -658,7 +738,7 @@ components:
         hasNext:
           type: boolean
           example: true
-        hasPrev:
+        hasPrevious:
           type: boolean
           example: false
 

@@ -5,8 +5,8 @@
  */
 
 import { z } from 'zod';
-import { OrderSchema, AddressSchema, OrderFeesSchema, OrderItemSchema, isValidStatusTransition } from './order-schemas';
-import { PaginationSchema } from './common-schemas';
+import { OrderSchema, AddressSchema, OrderFeesSchema, OrderItemSchema, isValidStatusTransition, ShippingMethodEnumSchema } from './order-schemas';
+import { CommonPaginationSchema } from './common-schemas';
 import { OrderTypeEnumSchema, OrderStatusEnumSchema, CurrencyEnumSchema } from './enum-schemas';
 
 // ============================================================================= 
@@ -18,10 +18,7 @@ export const CreateOrderRequestSchema = OrderSchema.omit({
   id: true, 
   orderNumber: true,
   createdAt: true, 
-  updatedAt: true,
-  completedAt: true,
-  cancelledAt: true,
-  auditTrail: true
+  updatedAt: true
 });
 
 // Update order request (partial, omit immutable fields)
@@ -43,16 +40,12 @@ export const UpdateOrderStatusRequestSchema = z.object({
 export const AddOrderItemRequestSchema = z.object({
   productId: z.string().uuid(),
   quantity: z.number().positive(),
-  custodyPreference: z.string().optional(),
-  certificateRequested: z.boolean().default(false),
-  specifications: z.record(z.string(), z.any()).optional()
+  custodyServiceId: z.string().uuid().optional()
 });
 
 export const UpdateOrderItemRequestSchema = z.object({
   quantity: z.number().positive().optional(),
-  custodyPreference: z.string().optional(),
-  certificateRequested: z.boolean().optional(),
-  specifications: z.record(z.string(), z.any()).optional()
+  custodyServiceId: z.string().uuid().optional()
 });
 
 export const ProcessOrderRequestSchema = z.object({
@@ -80,7 +73,7 @@ export const CalculateOrderRequestSchema = z.object({
     quantity: z.number().positive()
   })).min(1),
   shippingAddress: AddressSchema.optional(),
-  shippingMethod: z.string().optional(),
+  shippingMethod: ShippingMethodEnumSchema.optional(),
   currency: z.string().length(3).optional()
 });
 
@@ -97,7 +90,7 @@ export const OrderResponseSchema = z.object({
 // Multiple orders response (paginated)
 export const OrdersResponseSchema = z.object({
   orders: z.array(OrderSchema),
-  pagination: PaginationSchema,
+  pagination: CommonPaginationSchema,
   user: z.object({
     id: z.string()
   }).optional()
@@ -105,7 +98,7 @@ export const OrdersResponseSchema = z.object({
 
 export const AdminOrdersResponseSchema = z.object({
   orders: z.array(OrderSchema),
-  pagination: PaginationSchema,
+  pagination: CommonPaginationSchema,
   statistics: z.object({
     totalOrders: z.number().int(),
     pendingOrders: z.number().int(),
@@ -126,7 +119,7 @@ export const AdminOrdersResponseSchema = z.object({
 
 export const SmartOrdersResponseSchema = z.object({
   orders: z.array(OrderSchema),
-  pagination: PaginationSchema,
+  pagination: CommonPaginationSchema,
   context: z.object({
     requestedBy: z.string(),
     viewingOrdersFor: z.string(),

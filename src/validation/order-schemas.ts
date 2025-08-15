@@ -51,6 +51,8 @@ export const isValidStatusTransition = (from: string, to: string): boolean => {
 };
 
 // Entity Schemas
+// Shipping Method Enum Schema
+export const ShippingMethodEnumSchema = z.enum(['standard', 'priority', 'express', 'pickup']);
 
 // Address Schema - reusable for shipping/billing addresses
 export const AddressSchema = z.object({
@@ -70,31 +72,18 @@ export const AddressSchema = z.object({
 export const OrderItemSchema = z.object({
   id: z.string().uuid('Order item ID must be a valid UUID'),
   productId: z.string().uuid('Product ID must be a valid UUID'),
-  productName: z.string().min(1, 'Product name is required'),
-  productType: z.string(), // References ProductType enum
-  metal: z.string(), // References Metal enum
-  weight: z.number().positive('Weight must be positive'),
-  weightUnit: z.enum(['grams', 'troy_ounces', 'kilograms']).default('troy_ounces'),
-  purity: z.string().optional(), // e.g., "99.99%", ".999 fine"
   quantity: z.number().positive('Quantity must be positive'),
   unitPrice: z.number().positive('Unit price must be positive'),
   totalPrice: z.number().positive('Total price must be positive'),
-  currency: z.string().length(3, 'Currency must be 3-letter ISO code'), // References Currency enum
-  specifications: z.record(z.string(), z.any()).optional(),
-  producer: z.string().optional(), // References Producer enum
-  custodyPreference: z.string().optional(), // References Custodian enum
+  custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
   certificateRequested: z.boolean().default(false)
 });
 
 // Order Fees Schema - breakdown of additional charges
 export const OrderFeesSchema = z.object({
-  processing: z.number().nonnegative().default(0),
   shipping: z.number().nonnegative().default(0),
   insurance: z.number().nonnegative().default(0),
-  custodySetup: z.number().nonnegative().default(0),
   certification: z.number().nonnegative().default(0),
-  handling: z.number().nonnegative().default(0),
-  urgentProcessing: z.number().nonnegative().default(0),
   total: z.number().nonnegative()
 });
 
@@ -109,16 +98,29 @@ export const OrderPaymentMethodSchema = z.object({
   verified: z.boolean().default(false)
 });
 
+// CreateOrderInputSchema - for frontend input only
+export const CreateOrderInputSchema = z.object({
+  type: z.enum(['buy', 'sell']),
+  items: z.array(z.object({
+    productId: z.string(),
+    quantity: z.number().positive('Quantity must be positive'),
+    custodyServiceId: z.string().uuid().optional(),
+  })).min(1, 'Order must contain at least one item'),
+  shippingAddress: AddressSchema.optional(),
+  paymentMethod: OrderPaymentMethodSchema.optional(),
+  custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
+  notes: z.string().optional()
+});
+
+// Deprecated: CreateOrderRequestSchema (use CreateOrderInputSchema instead)
+// export const CreateOrderRequestSchema = ...
+// Deprecated - replaced by CreateOrderInputSchema
+
 // Tracking Information Schema
 export const OrderTrackingSchema = z.object({
   trackingNumber: z.string().optional(),
-  carrier: z.string().optional(), // e.g., 'FedEx', 'UPS', 'DHL'
-  service: z.string().optional(), // e.g., 'Overnight', 'Ground'
-  estimatedDelivery: z.coerce.date().optional(),
-  actualDelivery: z.coerce.date().optional(),
   trackingUrl: z.string().url().optional(),
-  signatureRequired: z.boolean().default(true),
-  insuranceAmount: z.number().nonnegative().optional()
+  signatureRequired: z.boolean().default(true)
 });
 
 // Order Audit Schema - track status changes
@@ -140,7 +142,6 @@ export const OrderSchema = z.object({
   userId: z.string().uuid('User ID must be a valid UUID'),
   type: OrderTypeEnumSchema, // References OrderType enum (buy, sell)
   status: OrderStatusEnumSchema, // References OrderStatus enum
-  priority: z.enum(['normal', 'high', 'urgent']).default('normal'),
   
   // Order Items
   items: z.array(OrderItemSchema).min(1, 'Order must contain at least one item'),
@@ -154,7 +155,6 @@ export const OrderSchema = z.object({
   
   // Address Information
   shippingAddress: AddressSchema.optional(),
-  billingAddress: AddressSchema.optional(),
   
   // Payment Information
   paymentMethod: OrderPaymentMethodSchema.optional(),
@@ -163,30 +163,17 @@ export const OrderSchema = z.object({
   
   // Shipping & Tracking
   tracking: OrderTrackingSchema.optional(),
-  shippingMethod: z.string().optional(), // e.g., 'standard', 'expedited', 'overnight'
+  shippingMethod: ShippingMethodEnumSchema.optional(), // 'standard', 'priority', 'express', 'pickup'
   
-  // Custody Information
-  custodyAssignments: z.array(z.object({
-    itemId: z.string().uuid(),
-    custodianId: z.string().uuid(),
-    custodyServiceId: z.string().uuid(),
-    assignedAt: z.coerce.date()
-  })).optional(),
   
   // Additional Information
   source: z.enum(['web', 'mobile', 'api', 'admin', 'phone']).default('web'),
-  salesRepId: z.string().uuid().optional(),
   notes: z.string().optional(),
-  internalNotes: z.string().optional(), // Only visible to staff
   
   // Timestamps
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  completedAt: z.coerce.date().optional(),
-  cancelledAt: z.coerce.date().optional(),
   
-  // Audit Trail
-  auditTrail: z.array(OrderAuditSchema).optional()
 });
 
 // Order Summary Schema - lightweight version for lists
@@ -202,3 +189,9 @@ export const OrderSummarySchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date()
 });
+
+// =============================================================================
+// TYPE EXPORTS (inferred from schemas)
+// =============================================================================
+export type CreateOrderInput = z.infer<typeof CreateOrderInputSchema>;
+export type ShippingMethod = z.infer<typeof ShippingMethodEnumSchema>;
