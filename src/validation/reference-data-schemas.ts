@@ -1,54 +1,119 @@
 /**
- * Reference Data Validation Schemas
+ * Reference Data Validation Schemas - Database Aligned
  * 
  * Zod schemas for validating reference data API responses
+ * Aligned with actual database structure and API implementation
  */
 
 import { z } from 'zod';
 
-// Reference data item schemas (simplified data transfer objects)
+// =============================================================================
+// CORRECTED REFERENCE DATA SCHEMAS
+// =============================================================================
+
+// Metal reference schema (matches enum structure)
 export const MetalReferenceSchema = z.object({
-  symbol: z.string(),
-  name: z.string(),
+  symbol: z.string().length(2), // Chemical symbol (AU, AG, PT, PD)
+  name: z.string(),              // Full name (Gold, Silver, etc.)
 });
 
+// Product type reference schema (matches enum structure)  
 export const ProductTypeReferenceSchema = z.object({
-  name: z.string(),
+  name: z.string(), // Type name (Coin, Bar, Cast Bar, etc.)
 });
 
+// Country reference schema (matches API field names)
 export const CountryReferenceSchema = z.object({
-  name: z.string(),
-  countryCode: z.string().length(2),
+  code: z.string().length(2).toLowerCase(), // ISO 3166-1 alpha-2 (lowercase)
+  name: z.string(),                         // Country name
 });
 
+// Currency reference schema (matches database structure)
 export const CurrencyReferenceSchema = z.object({
-  code: z.string().length(3),
-  name: z.string(),
-  symbol: z.string(),
+  isoCode2: z.string().length(2),     // 2-letter ISO code  
+  isoCode3: z.string().length(3),     // 3-letter ISO code (USD, EUR, etc.)
+  isoNumericCode: z.number().int(),   // Numeric ISO code (840 for USD)
 });
 
+// Producer reference schema (hybrid database + enum structure)
 export const ProducerReferenceSchema = z.object({
-  code: z.string(),
-  name: z.string(),
+  id: z.string(),   // UUID for database records, enum-based ID for enum values
+  name: z.string(), // Producer name
 });
 
+// Custodian reference schema (enum-based)
 export const CustodianReferenceSchema = z.object({
-  value: z.string(),
-  name: z.string(),
+  value: z.string(), // Custodian identifier/code
+  name: z.string(),  // Display name
 });
 
+// Payment frequency reference schema (enum-based)
 export const PaymentFrequencyReferenceSchema = z.object({
-  value: z.string(),
-  displayName: z.string(),
-  description: z.string(),
+  value: z.string(),         // Frequency code (daily, weekly, monthly, etc.)
+  displayName: z.string(),   // Human-readable name
+  description: z.string(),   // Detailed description
 });
 
+// Custody service type reference schema (enum-based)
 export const CustodyServiceTypeReferenceSchema = z.object({
-  value: z.string(),
-  displayName: z.string(),
+  value: z.string(),       // Service type code
+  displayName: z.string(), // Human-readable name  
+  description: z.string(), // Detailed description
 });
 
-// Main reference data response schema
+// =============================================================================
+// DATABASE-SPECIFIC SCHEMAS (for individual table operations)
+// =============================================================================
+
+// Metal database record schema
+export const MetalDatabaseRecordSchema = z.object({
+  id: z.string().uuid(),
+  metalName: z.string(),
+  symbol: z.string().length(2).optional(), // May not be in database
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Product type database record schema
+export const ProductTypeDatabaseRecordSchema = z.object({
+  id: z.string().uuid(),
+  productTypeName: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Producer database record schema
+export const ProducerDatabaseRecordSchema = z.object({
+  id: z.string().uuid(),
+  producerName: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Country database record schema
+export const CountryDatabaseRecordSchema = z.object({
+  id: z.string().uuid(),
+  issuingCountryName: z.string(),
+  isoCode2: z.string().length(2),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Currency database record schema
+export const CurrencyDatabaseRecordSchema = z.object({
+  id: z.string().uuid(),
+  isoCode2: z.string().length(2),
+  isoCode3: z.string().length(3),
+  isoNumericCode: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// =============================================================================
+// MAIN REFERENCE DATA RESPONSE SCHEMAS
+// =============================================================================
+
+// Main reference data response schema (matches current API)
 export const ReferenceDataResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
@@ -56,14 +121,14 @@ export const ReferenceDataResponseSchema = z.object({
     productTypes: z.array(ProductTypeReferenceSchema),
     countries: z.array(CountryReferenceSchema),
     currencies: z.array(CurrencyReferenceSchema),
-    producers: z.array(ProducerReferenceSchema),
+    producers: z.array(ProducerReferenceSchema), // Hybrid database + enum
     custodians: z.array(CustodianReferenceSchema),
     paymentFrequencies: z.array(PaymentFrequencyReferenceSchema),
     custodyServiceTypes: z.array(CustodyServiceTypeReferenceSchema),
   }),
 });
 
-// Individual response schemas
+// Individual response schemas (for dedicated endpoints)
 export const MetalsResponseSchema = z.object({
   success: z.boolean(),
   data: z.array(MetalReferenceSchema),
@@ -104,7 +169,75 @@ export const CustodyServiceTypesResponseSchema = z.object({
   data: z.array(CustodyServiceTypeReferenceSchema),
 });
 
-// Export inferred types
+// =============================================================================
+// DATABASE OPERATION RESPONSE SCHEMAS
+// =============================================================================
+
+// Database record response schemas (for CRUD operations)
+export const MetalDatabaseResponseSchema = z.object({
+  success: z.boolean(),
+  data: MetalDatabaseRecordSchema.optional(),
+  error: z.string().optional(),
+  details: z.string().optional(),
+});
+
+export const ProductTypeDatabaseResponseSchema = z.object({
+  success: z.boolean(),
+  data: ProductTypeDatabaseRecordSchema.optional(),
+  error: z.string().optional(),
+  details: z.string().optional(),
+});
+
+export const ProducerDatabaseResponseSchema = z.object({
+  success: z.boolean(),
+  data: ProducerDatabaseRecordSchema.optional(),
+  error: z.string().optional(),
+  details: z.string().optional(),
+});
+
+export const CountryDatabaseResponseSchema = z.object({
+  success: z.boolean(),
+  data: CountryDatabaseRecordSchema.optional(),
+  error: z.string().optional(),
+  details: z.string().optional(),
+});
+
+export const CurrencyDatabaseResponseSchema = z.object({
+  success: z.boolean(),
+  data: CurrencyDatabaseRecordSchema.optional(),
+  error: z.string().optional(),
+  details: z.string().optional(),
+});
+
+// =============================================================================
+// BULK OPERATION SCHEMAS
+// =============================================================================
+
+// Bulk reference data management
+export const BulkReferenceDataUpdateSchema = z.object({
+  metals: z.array(MetalDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
+  productTypes: z.array(ProductTypeDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
+  producers: z.array(ProducerDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
+  countries: z.array(CountryDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
+  currencies: z.array(CurrencyDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
+});
+
+// =============================================================================
+// ERROR HANDLING SCHEMAS
+// =============================================================================
+
+export const ReferenceDataErrorSchema = z.object({
+  success: z.literal(false),
+  error: z.string(),
+  details: z.string().optional(),
+  code: z.string().optional(),
+  timestamp: z.string().datetime().optional(),
+});
+
+// =============================================================================
+// EXPORT TYPES
+// =============================================================================
+
 export type MetalReference = z.infer<typeof MetalReferenceSchema>;
 export type ProductTypeReference = z.infer<typeof ProductTypeReferenceSchema>;
 export type CountryReference = z.infer<typeof CountryReferenceSchema>;
@@ -113,6 +246,8 @@ export type ProducerReference = z.infer<typeof ProducerReferenceSchema>;
 export type CustodianReference = z.infer<typeof CustodianReferenceSchema>;
 export type PaymentFrequencyReference = z.infer<typeof PaymentFrequencyReferenceSchema>;
 export type CustodyServiceTypeReference = z.infer<typeof CustodyServiceTypeReferenceSchema>;
+
+// Response types
 export type ReferenceDataResponse = z.infer<typeof ReferenceDataResponseSchema>;
 export type MetalsResponse = z.infer<typeof MetalsResponseSchema>;
 export type ProductTypesResponse = z.infer<typeof ProductTypesResponseSchema>;
@@ -122,3 +257,56 @@ export type ProducersResponse = z.infer<typeof ProducersResponseSchema>;
 export type CustodiansResponse = z.infer<typeof CustodiansResponseSchema>;
 export type PaymentFrequenciesResponse = z.infer<typeof PaymentFrequenciesResponseSchema>;
 export type CustodyServiceTypesResponse = z.infer<typeof CustodyServiceTypesResponseSchema>;
+
+// Database record types
+export type MetalDatabaseRecord = z.infer<typeof MetalDatabaseRecordSchema>;
+export type ProductTypeDatabaseRecord = z.infer<typeof ProductTypeDatabaseRecordSchema>;
+export type ProducerDatabaseRecord = z.infer<typeof ProducerDatabaseRecordSchema>;
+export type CountryDatabaseRecord = z.infer<typeof CountryDatabaseRecordSchema>;
+export type CurrencyDatabaseRecord = z.infer<typeof CurrencyDatabaseRecordSchema>;
+
+// Database response types
+export type MetalDatabaseResponse = z.infer<typeof MetalDatabaseResponseSchema>;
+export type ProductTypeDatabaseResponse = z.infer<typeof ProductTypeDatabaseResponseSchema>;
+export type ProducerDatabaseResponse = z.infer<typeof ProducerDatabaseResponseSchema>;
+export type CountryDatabaseResponse = z.infer<typeof CountryDatabaseResponseSchema>;
+export type CurrencyDatabaseResponse = z.infer<typeof CurrencyDatabaseResponseSchema>;
+
+// Bulk operation types
+export type BulkReferenceDataUpdate = z.infer<typeof BulkReferenceDataUpdateSchema>;
+
+// Error types
+export type ReferenceDataError = z.infer<typeof ReferenceDataErrorSchema>;
+
+// =============================================================================
+// HELPER SCHEMAS FOR VALIDATION
+// =============================================================================
+
+// Validation helper for checking if ID exists in producers list
+export const ProducerIdValidationSchema = z.string().refine(
+  async (id) => {
+    // This would be implemented to check against database + enum values
+    // For now, basic UUID or enum pattern validation
+    return z.string().uuid().safeParse(id).success || 
+           id.startsWith('enum-');
+  },
+  {
+    message: "Invalid producer ID - must be valid UUID or enum-based ID"
+  }
+);
+
+// Validation helper for metal symbols
+export const MetalSymbolValidationSchema = z.string().refine(
+  (symbol) => ['AU', 'AG', 'PT', 'PD'].includes(symbol),
+  {
+    message: "Invalid metal symbol - must be AU, AG, PT, or PD"
+  }
+);
+
+// Validation helper for currency codes
+export const CurrencyCodeValidationSchema = z.string().refine(
+  (code) => ['USD', 'EUR', 'GBP', 'CHF', 'CAD', 'AUD'].includes(code),
+  {
+    message: "Invalid currency code"
+  }
+);

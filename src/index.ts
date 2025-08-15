@@ -78,12 +78,22 @@ export {
 } from './validation/custody-schemas';
 
 // Order validation schemas - Export helper functions only (enums already exported above)
+/**
+ * Order validation schemas and helpers
+ * - validateOrderType, isValidOrderType, isValidOrderStatus, getValidStatusTransitions, isValidStatusTransition
+ * - CreateOrderInputSchema: Use for frontend → backend order creation requests
+ * - CustodyAssignmentSchema: Use for custody assignment input
+ */
 export {
   validateOrderType,
   isValidOrderType,
   isValidOrderStatus,
   getValidStatusTransitions,
-  isValidStatusTransition
+  isValidStatusTransition,
+  CreateOrderInputSchema,
+  // Types
+  type CreateOrderInput,
+  type ShippingMethod
 } from './validation/order-schemas';
 
 // Payment validation schemas - Export schemas AND explicitly export all Zod-inferred types
@@ -177,8 +187,37 @@ export {
 // SCHEMAS - Export validation schemas
 // =============================================================================
 export * from './validation/custody-schemas';
-export * from './validation/custody-api-schemas';
 export * from './validation/order-schemas';
+
+// Only export unique symbols from custody-api-schemas to avoid duplicate export errors
+export {
+  PaginationSchema,
+  CreateExtendedCustodianRequestSchema,
+  CreateExtendedCustodyServiceRequestSchema,
+  UpdateExtendedCustodyServiceRequestSchema,
+  CreateCustodyAssignmentRequestSchema,
+  UpdateCustodyAssignmentRequestSchema,
+  BulkCustodyAssignmentRequestSchema,
+  CustodianResponseSchema,
+  CustodyServiceResponseSchema,
+  CustodyAssignmentResponseSchema,
+  CustodiansResponseSchema,
+  CustodyServicesResponseSchema,
+  CustodyAssignmentsResponseSchema,
+  ExtendedCustodiansResponseSchema,
+  ExtendedCustodyServicesResponseSchema,
+  PositionCustodyResponseSchema,
+  CustodiansQuerySchema,
+  CustodyServicesQuerySchema,
+  CustodyAssignmentsQuerySchema,
+  // TYPE EXPORTS
+  type CreateExtendedCustodianRequestType,
+  type CreateExtendedCustodyServiceRequestType,
+  type UpdateExtendedCustodyServiceRequestType,
+  type CreateCustodyAssignmentRequestType,
+  type UpdateCustodyAssignmentRequestType,
+  type BulkCustodyAssignmentRequestType
+} from './validation/custody-api-schemas';
 
 // Reference data schemas - Export with explicit naming to avoid conflicts with contracts
 export {
@@ -221,7 +260,6 @@ export {
 
 // Export order-api schemas with explicit naming to avoid conflicts
 export {
-  CreateOrderRequestSchema,
   UpdateOrderRequestSchema,
   UpdateOrderStatusRequestSchema,
   OrderResponseSchema as OrderApiResponseSchema,
@@ -232,6 +270,8 @@ export {
   OrderStatsResponseSchema,
   OrderQueryParamsSchema,
   OrderStatsQuerySchema,
+  AddOrderItemRequestSchema,
+  UpdateOrderItemRequestSchema,
   validateOrderItems,
   validateOrderTotals,
   calculateOrderTotals,

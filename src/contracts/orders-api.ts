@@ -8,7 +8,6 @@ import { z } from 'zod';
 import {
   OrdersQuerySchema,
   OrderStatsQuerySchema,
-  CreateOrderRequestSchema,
   UpdateOrderRequestSchema,
   AddOrderItemRequestSchema,
   UpdateOrderItemRequestSchema,
@@ -22,6 +21,7 @@ import {
   OrderCalculationResponseSchema,
   OrderStatsResponseSchema
 } from '../validation/order-api-schemas';
+import { CreateOrderInputSchema } from '../validation/order-schemas';
 
 // Order Management endpoints
 export const orderApiContract = {
@@ -60,7 +60,7 @@ export const orderApiContract = {
     create: {
       method: 'POST' as const,
       path: '/orders',
-      body: CreateOrderRequestSchema,
+  body: CreateOrderInputSchema,
       responses: {
         201: OrderResponseSchema
       }

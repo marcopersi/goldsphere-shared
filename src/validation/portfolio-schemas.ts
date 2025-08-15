@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { CountryEnumSchema, ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
+import { ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
 import { PaymentFrequencyEnumSchema } from './custody-schemas';
 import { ProductSchema } from './product-schemas';
-import { PaginationSchema } from './common-schemas';
+import { CommonPaginationSchema } from './common-schemas';
 
 // Enum schemas
 export const PositionStatusSchema = z.enum(['active', 'closed']);
@@ -23,37 +23,30 @@ export const PositionSchema = z.object({
   id: z.string().min(1),
   userId: z.string().min(1),
   productId: z.string().min(1),
+  portfolioId: z.string().uuid('Portfolio ID must be a valid UUID'),
   product: ProductSchema,
   purchaseDate: z.coerce.date(),
   purchasePrice: z.number().positive(),
   marketPrice: z.number().positive(),
   quantity: z.number().positive(),
-  issuingCountry: CountryEnumSchema,
-  producer: ProducerEnumSchema,
-  certifiedProvenance: z.boolean(),
   status: PositionStatusSchema,
   closedDate: z.coerce.date().optional(),
   notes: z.string().max(1000).optional(),
-  
-  // Custody fields
-  custodyServiceId: z.string().min(1).optional(),
-  custody: PositionCustodySchema.optional(),
-  
+  custodyServiceId: z.string().uuid().optional(),
+  custody: PositionCustodySchema.optional(), 
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 
-// Position creation schema
+// Update creation schema to require portfolioId
 export const PositionCreateRequestSchema = z.object({
-  productId: z.string().min(1),
+  productId: z.string().uuid('Product ID must be a valid UUID'),
+  portfolioId: z.string().uuid('Portfolio ID must be a valid UUID'), // ⭐ ADD THIS
   purchaseDate: z.coerce.date(),
   purchasePrice: z.number().min(0.01),
   quantity: z.number().min(0.001),
-  issuingCountry: CountryEnumSchema,
-  producer: ProducerEnumSchema,
-  certifiedProvenance: z.boolean(),
   notes: z.string().max(1000).optional(),
-  custodyServiceId: z.string().min(1), // Required for position creation
+  custodyServiceId: z.string().uuid().optional(), // Make optional
 });
 
 // Position update schema
@@ -62,7 +55,7 @@ export const PositionUpdateRequestSchema = z.object({
   quantity: z.number().min(0.001).optional(),
   notes: z.string().max(1000).optional(),
   status: PositionStatusSchema.optional(),
-  custodyServiceId: z.string().min(1).optional(),
+  custodyServiceId: z.string().uuid().optional(),
 });
 
 // Transaction schema
@@ -140,12 +133,12 @@ export const TransactionQueryParamsSchema = z.object({
 // Response schemas
 export const PositionsResponseSchema = z.object({
   positions: z.array(PositionSchema),
-  pagination: PaginationSchema,
+  pagination: CommonPaginationSchema,
 });
 
 export const TransactionsResponseSchema = z.object({
   transactions: z.array(TransactionHistoryItemSchema),
-  pagination: PaginationSchema,
+  pagination: CommonPaginationSchema,
 });
 
 // Export types derived from schemas
