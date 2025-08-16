@@ -506,8 +506,7 @@ components:
           example: 2100.50
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
-          description: Price currency
+          description: Price currency (ISO 4217)
           example: "USD"
         producer:
           type: string
@@ -634,8 +633,7 @@ components:
           description: Current price per unit
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
-          description: Price currency
+          description: Price currency (ISO 4217)
         producer:
           type: string
           minLength: 1

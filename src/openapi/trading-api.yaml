@@ -160,7 +160,7 @@ paths:
   /orders/calculate:
     post:
       summary: Calculate order totals
-      description: Calculate totals, fees, and taxes for a prospective order
+  description: Calculate totals and taxes for a prospective order
       tags:
         - Orders
       requestBody:
@@ -624,12 +624,11 @@ paths:
             example: "gold,silver,platinum"
         - name: currency
           in: query
-          description: Currency for price quotes
+          description: Currency for price quotes (ISO 4217)
           required: false
           schema:
             type: string
-            enum: [USD, EUR, GBP, CHF]
-            default: USD
+            example: USD
       responses:
         '200':
           description: Current spot prices
@@ -682,12 +681,11 @@ paths:
             enum: [1d, 7d, 1m, 3m, 6m, 1y, 5y]
         - name: currency
           in: query
-          description: Currency for price quotes
+          description: Currency for price quotes (ISO 4217)
           required: false
           schema:
             type: string
-            enum: [USD, EUR, GBP, CHF]
-            default: USD
+            example: USD
       responses:
         '200':
           description: Historical price data
@@ -791,7 +789,7 @@ components:
           example: true
         data:
           $ref: '#/components/schemas/Order'
-    Order:
+  Order:
       type: object
       required:
         - id
@@ -829,20 +827,8 @@ components:
           description: Items in the order
         subtotal:
           type: number
-          description: Subtotal before fees and taxes
+          description: Subtotal before taxes
           example: 2100.50
-        fees:
-          type: object
-          properties:
-            processing:
-              type: number
-              example: 25.00
-            shipping:
-              type: number
-              example: 15.00
-            insurance:
-              type: number
-              example: 10.00
         taxes:
           type: number
           description: Tax amount
@@ -853,37 +839,8 @@ components:
           example: 2301.25
         currency:
           type: string
-          enum: [USD, EUR, CHF, GBP, CAD, AUD]
-          description: Order currency
+          description: Order currency (ISO 4217)
           example: "USD"
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
-        paymentMethod:
-          type: object
-          properties:
-            type:
-              type: string
-              enum: [credit_card, bank_transfer, crypto, check, wire]
-            provider:
-              type: string
-              example: "stripe"
-            last4:
-              type: string
-              example: "1234"
-            brand:
-              type: string
-              example: "visa"
-            expiryMonth:
-              type: integer
-              minimum: 1
-              maximum: 12
-              example: 12
-            expiryYear:
-              type: integer
-              example: 2030
-            verified:
-              type: boolean
-              default: false
         tracking:
           type: object
           properties:
@@ -955,7 +912,7 @@ components:
           type: boolean
           description: Whether a certificate is requested for this item
           default: false
-    CreateOrderInput:
+  CreateOrderInput:
       type: object
       required:
         - type
@@ -968,7 +925,6 @@ components:
           description: Order type
         currency:
           type: string
-          enum: [USD, EUR, CHF, GBP, CAD, AUD]
           description: Order currency (ISO 4217)
         items:
           type: array
@@ -989,34 +945,13 @@ components:
                 type: string
                 description: Optional custody service identifier for this item
           minItems: 1
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
-        paymentMethod:
-          type: object
-          properties:
-            type:
-              type: string
-              enum: [credit_card, bank_transfer, crypto, check, wire]
-            provider:
-              type: string
-            last4:
-              type: string
-            brand:
-              type: string
-            expiryMonth:
-              type: integer
-              minimum: 1
-              maximum: 12
-            expiryYear:
-              type: integer
-            verified:
-              type: boolean
+  # address/payment removed
         notes:
           type: string
           maxLength: 500
           description: Order notes or special instructions
 
-    CalculateOrderRequest:
+  CalculateOrderRequest:
       type: object
       required:
         - items
@@ -1034,8 +969,7 @@ components:
               quantity:
                 type: number
                 minimum: 1
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
+  # address removed
         shippingMethod:
           type: string
           enum: [standard, priority, express, pickup]
@@ -1113,8 +1047,7 @@ components:
     OrderUpdateRequest:
       type: object
       properties:
-        shippingAddress:
-          $ref: '#/components/schemas/Address'
+  # address removed
         notes:
           type: string
           maxLength: 500
@@ -1147,14 +1080,13 @@ components:
                 description: Quantity for quote
           minItems: 1
 
-    Quote:
+  Quote:
       type: object
       required:
         - id
         - type
         - items
         - subtotal
-        - fees
         - taxes
         - totalAmount
         - currency
@@ -1186,17 +1118,8 @@ components:
                 type: number
         subtotal:
           type: number
-          description: Subtotal before fees and taxes
+          description: Subtotal before taxes
           example: 2100.50
-        fees:
-          type: object
-          properties:
-            processing:
-              type: number
-            shipping:
-              type: number
-            insurance:
-              type: number
         taxes:
           type: number
           description: Tax amount
@@ -1207,8 +1130,7 @@ components:
           example: 2301.25
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
-          description: Quote currency
+          description: Quote currency (ISO 4217)
         validUntil:
           type: string
           format: date-time
@@ -1229,7 +1151,7 @@ components:
           format: date-time
           example: "2024-08-07T10:30:00Z"
 
-    OrderCalculationResponse:
+  OrderCalculationResponse:
       type: object
       properties:
         success:
@@ -1256,15 +1178,6 @@ components:
                     type: number
             subtotal:
               type: number
-            fees:
-              type: object
-              properties:
-                processing:
-                  type: number
-                shipping:
-                  type: number
-                insurance:
-                  type: number
             taxes:
               type: number
             totalAmount:
@@ -1334,8 +1247,7 @@ components:
           example: 2100.50
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
-          description: Price currency
+          description: Price currency (ISO 4217)
         unit:
           type: string
           description: Price unit
@@ -1380,8 +1292,7 @@ components:
           example: 150000.00
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
-          description: Portfolio base currency
+          description: Portfolio base currency (ISO 4217)
         positions:
           type: array
           items:

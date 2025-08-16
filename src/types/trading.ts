@@ -1,29 +1,19 @@
 // Trading API Types
-import { PaginationInfo, PaymentMethodType, Address } from './common';
-import { Metal, Currency, OrderType, OrderStatus } from '../enums';
+import { PaginationInfo } from './common';
+import { Metal } from '../enums';
 import type { ShippingMethod } from '../validation/order-schemas';
 
 export interface Order {
   id: string;
   orderNumber: string;
   userId: string;
-  type: OrderType;
-  status: OrderStatus;
+  type: 'buy' | 'sell';
+  status: string; // e.g., 'pending', 'processing', 'shipped', 'delivered', 'cancelled', etc.
   items: OrderItem[];
   subtotal: number;
-  fees: {
-    processing: number;
-    shipping: number;
-    insurance: number;
-  };
   taxes: number;
   totalAmount: number;
-  currency: 'USD' | 'EUR' | 'CHF' | 'GBP' | 'CAD' | 'AUD';
-  shippingAddress: Address;
-  paymentMethod: {
-    type: PaymentMethodType;
-    last4?: string;
-  };
+  currency: string; // ISO 4217 (e.g., USD)
   // Optional per validation schema
   shippingMethod?: ShippingMethod;
   tracking?: {
@@ -50,38 +40,18 @@ export interface OrderItem {
 }
 
 export interface OrderRequest {
-  type: OrderType;
-  currency: 'USD' | 'EUR' | 'CHF' | 'GBP' | 'CAD' | 'AUD';
+  type: 'buy' | 'sell';
+  currency: string; // ISO 4217 (e.g., USD)
   items: {
     productId: string;
     quantity: number;
     custodyServiceId?: string;
   }[];
-  shippingAddress?: Address;
-  paymentMethod?: {
-    type: PaymentMethodType;
-    provider?: string;
-    last4?: string;
-    brand?: string;
-    expiryMonth?: number;
-    expiryYear?: number;
-    verified?: boolean;
-  };
   custodyServiceId?: string;
   notes?: string;
 }
 
 export interface OrderUpdateRequest {
-  shippingAddress?: Address;
-  paymentMethod?: {
-    type: PaymentMethodType;
-    provider?: string;
-    last4?: string;
-    brand?: string;
-    expiryMonth?: number;
-    expiryYear?: number;
-    verified?: boolean;
-  };
   shippingMethod?: ShippingMethod;
   tracking?: {
     trackingNumber?: string;
@@ -132,7 +102,7 @@ export interface SmartOrdersResponse {
 }
 
 export interface QuoteRequest {
-  type: OrderType;
+  type: 'buy' | 'sell';
   items: {
     productId: string;
     quantity: number;
@@ -141,7 +111,7 @@ export interface QuoteRequest {
 
 export interface Quote {
   id: string;
-  type: OrderType;
+  type: 'buy' | 'sell';
   items: {
     productId: string;
     productName: string;
@@ -150,14 +120,9 @@ export interface Quote {
     totalPrice: number;
   }[];
   subtotal: number;
-  fees: {
-    processing: number;
-    shipping: number;
-    insurance: number;
-  };
   taxes: number;
   totalAmount: number;
-  currency: Currency;
+  currency: string; // ISO 4217 (e.g., USD)
   validUntil: string;
   marketConditions: {
     spotPrice: number;
@@ -169,7 +134,7 @@ export interface Quote {
 
 export interface MetalPrice {
   price: number;
-  currency: Currency;
+  currency: string; // ISO 4217 (e.g., USD)
   unit: string;
   change24h: number;
   changePercent24h: number;
@@ -191,7 +156,7 @@ export interface LivePricesResponse {
 
 export interface HistoricalPriceData {
   metal: Metal;
-  currency: Currency;
+  currency: string; // ISO 4217 (e.g., USD)
   period: '1d' | '7d' | '1m' | '3m' | '6m' | '1y' | '5y';
   data: {
     timestamp: string;
@@ -203,19 +168,19 @@ export interface HistoricalPriceData {
 export interface OrderQueryParams {
   page?: number;
   limit?: number;
-  status?: OrderStatus;
-  type?: OrderType;
+  status?: string;
+  type?: 'buy' | 'sell';
   startDate?: Date;
   endDate?: Date;
 }
 
 export interface PriceQueryParams {
   metals?: Metal[];
-  currency?: Currency;
+  currency?: string; // ISO 4217 (e.g., USD)
 }
 
 export interface HistoricalPriceParams {
   metal: Metal;
   period: '1d' | '7d' | '1m' | '3m' | '6m' | '1y' | '5y';
-  currency?: Currency;
+  currency?: string; // ISO 4217 (e.g., USD)
 }
