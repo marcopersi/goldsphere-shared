@@ -7,6 +7,7 @@
 import { z } from 'zod';
 import { OrderType, OrderStatus } from '../enums';
 import { OrderTypeEnumSchema, OrderStatusEnumSchema } from './enum-schemas';
+import { CurrencyEnum } from '..';
 
 // Helper functions for order validation
 export const validateOrderType = (value: string): OrderType | undefined => {
@@ -151,8 +152,9 @@ export const OrderSchema = z.object({
   fees: OrderFeesSchema,
   taxes: z.number().nonnegative('Taxes must be non-negative'),
   totalAmount: z.number().positive('Total amount must be positive'),
-  currency: z.string().length(3, 'Currency must be 3-letter ISO code'), // References Currency enum
-  
+  // Oder dynamisch aus dem CurrencyEnum extrahiert:
+  currency: z.enum(Object.values(CurrencyEnum).map(c => c.isoCode3) as [string, ...string[]]),  
+
   // Address Information
   shippingAddress: AddressSchema.optional(),
   
