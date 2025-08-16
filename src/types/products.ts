@@ -9,7 +9,7 @@ export interface Product {
   weight: number;
   weightUnit: WeightUnit;
   purity: number;
-  price: number;
+  marketPrice: number;
   currency: Currency;
   producer: Producer;
   country?: Country;
