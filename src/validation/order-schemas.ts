@@ -101,6 +101,7 @@ export const OrderPaymentMethodSchema = z.object({
 // CreateOrderInputSchema - for frontend input only
 export const CreateOrderInputSchema = z.object({
   type: z.enum(['buy', 'sell']),
+  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),
   items: z.array(z.object({
     productId: z.string(),
     quantity: z.number().positive('Quantity must be positive'),
@@ -151,7 +152,7 @@ export const OrderSchema = z.object({
   fees: OrderFeesSchema,
   taxes: z.number().nonnegative('Taxes must be non-negative'),
   totalAmount: z.number().positive('Total amount must be positive'),
-  currency: z.string(),  
+  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),  
 
   // Address Information
   shippingAddress: AddressSchema.optional(),
@@ -184,7 +185,7 @@ export const OrderSummarySchema = z.object({
   type: z.string(),
   status: z.string(),
   totalAmount: z.number(),
-  currency: z.string(),
+  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),
   itemCount: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date()
