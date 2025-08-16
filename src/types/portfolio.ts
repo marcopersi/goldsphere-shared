@@ -11,8 +11,6 @@ export interface Position {
   purchaseDate: Date; // ISO date string
   purchasePrice: number;
   quantity: number;
-  issuingCountry: Country;
-  producer: Producer;
   certifiedProvenance: boolean;
   status: "active" | "closed";
   closedDate?: Date; // ISO date string
