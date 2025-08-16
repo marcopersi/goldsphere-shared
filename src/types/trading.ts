@@ -18,7 +18,7 @@ export interface Order {
   };
   taxes: number;
   totalAmount: number;
-  currency: Currency;
+  currency: string;
   shippingAddress: Address;
   paymentMethod: {
     type: PaymentMethodType;
