@@ -23,6 +23,22 @@ export * from './contracts/orders-api';
 export * from './types/common';
 export * from './types/products';
 export * from './types/portfolio';
+// Custody types (aliased to avoid name collisions with contracts and refs)
+export {
+  type Custodian as CustodyCustodian,
+  type CustodyService as CustodyServiceEntity,
+  type ExtendedCustodian as CustodyExtendedCustodian,
+  type ExtendedCustodyService as CustodyExtendedCustodyService,
+  type CustodyAssignment as CustodyAssignmentType,
+  type PositionCustodyInfo as CustodyPositionInfo,
+  type CreateCustodianRequest as CustodyCreateCustodianRequest,
+  type UpdateCustodianRequest as CustodyUpdateCustodianRequest,
+  type CreateCustodyServiceRequest as CustodyCreateCustodyServiceRequest,
+  type UpdateCustodyServiceRequest as CustodyUpdateCustodyServiceRequest,
+  type CustodiansResponse as CustodyCustodiansResponse,
+  type CustodyServicesResponse as CustodyServicesResponseType,
+  type CustodyErrorResponse as CustodyErrorResponseType,
+} from './types/custody';
 export * from './types/trading';
 export * from './types/ui';
 
@@ -57,6 +73,11 @@ export { CustodyServiceType } from './enums/custody-service-type';
 export * from './validation/common-schemas';
 export * from './validation/product-schemas';
 export * from './validation/portfolio-schemas';
+// Export only the consolidated positions response schema/type
+export {
+  PortfolioPositionsResponseSchema,
+  type PortfolioPositionsResponse
+} from './validation/portfolio-positions-schemas';
 export * from './validation/order-schemas';
 
 // Enum validation schemas - Export with explicit naming

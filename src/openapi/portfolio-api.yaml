@@ -17,6 +17,81 @@ security:
   - bearerAuth: []
 
 paths:
+  /portfolios/{portfolioId}/positions:
+    get:
+      summary: Get comprehensive portfolio positions with nested data
+      tags: [Portfolio, Positions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Portfolio identifier
+      responses:
+        '200':
+          description: Portfolio positions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioPositionsResponse'
+              example:
+                success: true
+                portfolioId: "74f1b5f9-ad9c-4e5a-828c-310359406614"
+                summary:
+                  total: 1
+                  totalValue: 2150.5
+                  totalCost: 2150.5
+                  totalGainLoss: 0
+                  totalGainLossPercentage: 0
+                positions:
+                  - id: "e051790f-6da2-4ce9-904d-f65b01670c4a"
+                    userId: "5207b74b-95ab-461c-be54-abc297ad4266"
+                    portfolioId: "74f1b5f9-ad9c-4e5a-828c-310359406614"
+                    purchaseDate: "2025-08-15T13:02:48.625Z"
+                    purchasePrice: 2150.5
+                    marketPrice: 2150.5
+                    quantity: 1
+                    status: "active"
+                    product:
+                      productId: "31bd9923-12b4-4c4a-ac63-14ea019ccf57"
+                      name: "American Gold Eagle"
+                      productTypeId: "9664e5a1-9fe3-4f4f-a128-e424db55674c"
+                      productTypeName: "Coin"
+                      weight: 31.1035
+                      weightUnit: "troy_ounces"
+                      purity: 0.9167
+                      price: 2150.5
+                      currency: "USD"
+                      year: 2024
+                      description: "Official gold bullion coin of the United States"
+                      imageUrl: "https://example.com/gold-eagle.jpg"
+                      metal:
+                        id: "0efc02bb-944b-47a9-b3d3-ab32a0d1f381"
+                        name: "Gold"
+                        symbol: "AU"
+                      producer:
+                        id: "c9ec1efd-e8ee-44a7-8285-4981f22d12b9"
+                        producerName: "United States Mint"
+                      issuingCountry:
+                        id: "f4a4089d-32fe-45e3-a850-377ed6c26d4d"
+                        issuingCountryName: "USA"
+                        isoCode2: "US"
+                    custodyService: null
+                    transactions: []
+                    createdAt: "2025-08-15T13:02:48.625Z"
+                    updatedAt: "2025-08-15T13:02:48.625Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /positions:
     get:
       summary: Get user positions
@@ -375,6 +450,21 @@ components:
       bearerFormat: JWT
 
   schemas:
+    PortfolioPositionsResponse:
+      type: object
+      required: [success, positions, portfolioId, summary]
+      properties:
+        success:
+          type: boolean
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        portfolioId:
+          type: string
+          format: uuid
+        summary:
+          $ref: '#/components/schemas/PortfolioSummary'
     Position:
       type: object
       required:
@@ -715,7 +805,7 @@ components:
         hasNext:
           type: boolean
           example: true
-  hasPrevious:
+        hasPrevious:
           type: boolean
           example: false
 
