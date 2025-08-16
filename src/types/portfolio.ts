@@ -1,16 +1,15 @@
 import { PaginationInfo } from './common';
-import { Metal, Country, Producer, PaymentFrequency } from '../enums';
+import { Country, Producer, Metal, PaymentFrequency } from '../enums';
 import { Product } from './products';
+import { CustodyService } from '../validation/custody-schemas';
 
 // Core entities
 export interface Position {
   id: string;
   userId: string;
-  productId: string;
   product: Product;
   purchaseDate: Date; // ISO date string
   purchasePrice: number;
-  marketPrice: number;
   quantity: number;
   issuingCountry: Country;
   producer: Producer;
@@ -20,7 +19,9 @@ export interface Position {
   notes?: string;
   
   // Custody fields
-  custodyServiceId?: string;
+  custodyService: CustodyService | null;  // CustodyService with nested custodian
+  transactions: Transaction[];    // Array of existing Transaction type
+
   custody?: {
     custodyServiceId: string;
     custodyServiceName: string;
@@ -47,11 +48,6 @@ export interface Transaction {
   createdAt: Date; // ISO date string
 }
 
-export interface TransactionHistoryItem extends Transaction {
-  productName: string;
-  total: number;
-}
-
 // Request/Response types
 export interface PositionCreateRequest {
   productId: string;
@@ -66,21 +62,10 @@ export interface PositionCreateRequest {
 }
 
 export interface PositionUpdateRequest {
-  marketPrice?: number;
   quantity?: number;
   notes?: string;
   status?: "active" | "closed";
   custodyServiceId?: string;
-}
-
-export interface TransactionCreateRequest {
-  positionId: string;
-  type: "buy" | "sell";
-  date: Date;
-  quantity: number;
-  price: number;
-  fees?: number;
-  notes?: string;
 }
 
 // Portfolio Summary types
@@ -131,6 +116,17 @@ export interface PositionsResponse {
 }
 
 export interface TransactionsResponse {
-  transactions: TransactionHistoryItem[];
+  transactions: Transaction[];
   pagination: PaginationInfo;
+}
+
+// ==============================
+// New comprehensive positions API
+// ==============================
+
+export interface PortfolioPositionsResponse {
+  success: boolean;
+  positions: Position[];
+  portfolioId: string;
+  summary: PortfolioSummary;
 }
