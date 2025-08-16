@@ -1,9 +1,11 @@
 // Trading API Types
 import { PaginationInfo, PaymentMethodType, Address } from './common';
 import { Metal, Currency, OrderType, OrderStatus } from '../enums';
+import type { ShippingMethod } from '../validation/order-schemas';
 
 export interface Order {
   id: string;
+  orderNumber: string;
   userId: string;
   type: OrderType;
   status: OrderStatus;
@@ -22,6 +24,8 @@ export interface Order {
     type: PaymentMethodType;
     last4?: string;
   };
+  // Optional per validation schema
+  shippingMethod?: ShippingMethod;
   tracking?: {
     carrier: string;
     trackingNumber: string;
@@ -33,12 +37,16 @@ export interface Order {
 }
 
 export interface OrderItem {
+  // Present in validation schema
+  id: string;
   productId: string;
   productName: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  specifications?: Record<string, any>;
+  // Optional fields per validation schema
+  custodyServiceId?: string;
+  certificateRequested?: boolean;
 }
 
 export interface OrderRequest {
@@ -46,17 +54,39 @@ export interface OrderRequest {
   items: {
     productId: string;
     quantity: number;
+    custodyServiceId?: string;
   }[];
-  shippingAddress: Address;
-  paymentMethod: {
+  shippingAddress?: Address;
+  paymentMethod?: {
     type: PaymentMethodType;
-    details?: Record<string, any>;
+    provider?: string;
+    last4?: string;
+    brand?: string;
+    expiryMonth?: number;
+    expiryYear?: number;
+    verified?: boolean;
   };
+  custodyServiceId?: string;
   notes?: string;
 }
 
 export interface OrderUpdateRequest {
   shippingAddress?: Address;
+  paymentMethod?: {
+    type: PaymentMethodType;
+    provider?: string;
+    last4?: string;
+    brand?: string;
+    expiryMonth?: number;
+    expiryYear?: number;
+    verified?: boolean;
+  };
+  shippingMethod?: ShippingMethod;
+  tracking?: {
+    trackingNumber?: string;
+    trackingUrl?: string;
+    signatureRequired?: boolean;
+  };
   notes?: string;
 }
 
