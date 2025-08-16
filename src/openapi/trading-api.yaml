@@ -853,7 +853,7 @@ components:
           example: 2301.25
         currency:
           type: string
-          enum: [USD, EUR, GBP, CHF]
+          enum: [USD, EUR, CHF, GBP, CAD, AUD]
           description: Order currency
           example: "USD"
         shippingAddress:
@@ -959,12 +959,17 @@ components:
       type: object
       required:
         - type
+        - currency
         - items
       properties:
         type:
           type: string
           enum: [buy, sell]
           description: Order type
+        currency:
+          type: string
+          enum: [USD, EUR, CHF, GBP, CAD, AUD]
+          description: Order currency (ISO 4217)
         items:
           type: array
           items:

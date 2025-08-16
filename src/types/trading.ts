@@ -18,7 +18,7 @@ export interface Order {
   };
   taxes: number;
   totalAmount: number;
-  currency: string;
+  currency: 'USD' | 'EUR' | 'CHF' | 'GBP' | 'CAD' | 'AUD';
   shippingAddress: Address;
   paymentMethod: {
     type: PaymentMethodType;
@@ -51,6 +51,7 @@ export interface OrderItem {
 
 export interface OrderRequest {
   type: OrderType;
+  currency: 'USD' | 'EUR' | 'CHF' | 'GBP' | 'CAD' | 'AUD';
   items: {
     productId: string;
     quantity: number;
