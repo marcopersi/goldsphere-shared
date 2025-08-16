@@ -54,19 +54,8 @@ export const isValidStatusTransition = (from: string, to: string): boolean => {
 // Shipping Method Enum Schema
 export const ShippingMethodEnumSchema = z.enum(['standard', 'priority', 'express', 'pickup']);
 
-// Address Schema - reusable for shipping/billing addresses
-export const AddressSchema = z.object({
-  type: z.enum(['shipping', 'billing', 'both']),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  street: z.string().min(1, 'Street address is required'),
-  city: z.string().min(1, 'City is required'),
-  state: z.string().min(1, 'State/Province is required'),
-  zipCode: z.string().min(1, 'ZIP/Postal code is required'),
-  country: z.string().length(2, 'Country must be 2-letter ISO code'), // References Country enum
-  phone: z.string().optional(),
-  isDefault: z.boolean().default(false)
-});
+// Address handling removed per KISS directive
+export const AddressSchema = z.never();
 
 // Order Item Schema - individual line items in an order
 export const OrderItemSchema = z.object({
@@ -80,35 +69,23 @@ export const OrderItemSchema = z.object({
 });
 
 // Order Fees Schema - breakdown of additional charges
-export const OrderFeesSchema = z.object({
-  shipping: z.number().nonnegative().default(0),
-  insurance: z.number().nonnegative().default(0),
-  certification: z.number().nonnegative().default(0),
-  total: z.number().nonnegative()
-});
+// Fees removed per KISS directive
+export const OrderFeesSchema = z.never();
 
 // Payment Method Schema for orders
-export const OrderPaymentMethodSchema = z.object({
-  type: z.enum(['credit_card', 'bank_transfer', 'crypto', 'check', 'wire']),
-  provider: z.string().optional(), // e.g., 'stripe', 'coinbase'
-  last4: z.string().optional(), // Last 4 digits for cards
-  brand: z.string().optional(), // e.g., 'visa', 'mastercard'
-  expiryMonth: z.number().min(1).max(12).optional(),
-  expiryYear: z.number().optional(),
-  verified: z.boolean().default(false)
-});
+// Payment method removed per KISS directive
+export const OrderPaymentMethodSchema = z.never();
 
 // CreateOrderInputSchema - for frontend input only
 export const CreateOrderInputSchema = z.object({
   type: z.enum(['buy', 'sell']),
-  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),
+  currency: z.string().length(3),
   items: z.array(z.object({
     productId: z.string(),
     quantity: z.number().positive('Quantity must be positive'),
     custodyServiceId: z.string().uuid().optional(),
   })).min(1, 'Order must contain at least one item'),
-  shippingAddress: AddressSchema.optional(),
-  paymentMethod: OrderPaymentMethodSchema.optional(),
+  // address/payment removed
   custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
   notes: z.string().optional()
 });
@@ -142,25 +119,22 @@ export const OrderSchema = z.object({
   orderNumber: z.string().min(1, 'Order number is required'), // Human-readable order number
   userId: z.string().uuid('User ID must be a valid UUID'),
   type: OrderTypeEnumSchema, // References OrderType enum (buy, sell)
-  status: OrderStatusEnumSchema, // References OrderStatus enum
+  status: OrderStatusEnumSchema,
   
   // Order Items
   items: z.array(OrderItemSchema).min(1, 'Order must contain at least one item'),
   
   // Financial Information
   subtotal: z.number().nonnegative('Subtotal must be non-negative'),
-  fees: OrderFeesSchema,
   taxes: z.number().nonnegative('Taxes must be non-negative'),
   totalAmount: z.number().positive('Total amount must be positive'),
-  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),  
+  currency: z.string().length(3),  
 
   // Address Information
-  shippingAddress: AddressSchema.optional(),
+  // removed
   
   // Payment Information
-  paymentMethod: OrderPaymentMethodSchema.optional(),
-  paymentStatus: z.enum(['pending', 'authorized', 'captured', 'failed', 'refunded']).default('pending'),
-  paymentIntentId: z.string().optional(), // Reference to payment processor
+  // removed
   
   // Shipping & Tracking
   tracking: OrderTrackingSchema.optional(),
@@ -185,7 +159,7 @@ export const OrderSummarySchema = z.object({
   type: z.string(),
   status: z.string(),
   totalAmount: z.number(),
-  currency: z.enum(['USD', 'EUR', 'CHF', 'GBP', 'CAD', 'AUD']),
+  currency: z.string(),
   itemCount: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date()
