@@ -5,9 +5,9 @@
  */
 
 import { z } from 'zod';
-import { OrderSchema, AddressSchema, OrderFeesSchema, OrderItemSchema, isValidStatusTransition, ShippingMethodEnumSchema } from './order-schemas';
+import { OrderSchema, AddressSchema, OrderItemSchema, isValidStatusTransition, ShippingMethodEnumSchema } from './order-schemas';
 import { CommonPaginationSchema } from './common-schemas';
-import { OrderTypeEnumSchema, OrderStatusEnumSchema, CurrencyEnumSchema } from './enum-schemas';
+import { OrderTypeEnumSchema, OrderStatusEnumSchema } from './enum-schemas';
 
 // ============================================================================= 
 // REQUEST SCHEMAS
@@ -72,7 +72,7 @@ export const CalculateOrderRequestSchema = z.object({
     productId: z.string().uuid(),
     quantity: z.number().positive()
   })).min(1),
-  shippingAddress: AddressSchema.optional(),
+  // address removed
   shippingMethod: ShippingMethodEnumSchema.optional(),
   currency: z.string().length(3).optional()
 });
@@ -150,8 +150,7 @@ export const OrderCalculationResponseSchema = z.object({
       unitPrice: z.number(),
       totalPrice: z.number()
     })),
-    subtotal: z.number(),
-    fees: OrderFeesSchema,
+  subtotal: z.number(),
     taxes: z.number(),
     totalAmount: z.number(),
     currency: z.string()
@@ -194,7 +193,7 @@ export const OrderQueryParamsSchema = z.object({
   dateTo: z.string().optional(),   // ISO date string
   minAmount: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
   maxAmount: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
-  currency: CurrencyEnumSchema.optional(),
+  currency: z.string().length(3).optional(),
   search: z.string().optional(), // Search by order number, customer name, etc.
   priority: z.enum(['normal', 'high', 'urgent']).optional(),
   source: z.enum(['web', 'mobile', 'api', 'admin', 'phone']).optional(),
@@ -221,7 +220,6 @@ export const OrderStatsQuerySchema = z.object({
 // Export inferred types
 export type Order = z.infer<typeof OrderSchema>;
 export type OrderItem = z.infer<typeof OrderItemSchema>;
-export type OrderFees = z.infer<typeof OrderFeesSchema>;
 export type Address = z.infer<typeof AddressSchema>;
 export type CreateOrderRequest = z.infer<typeof CreateOrderRequestSchema>;
 export type UpdateOrderRequest = z.infer<typeof UpdateOrderRequestSchema>;
@@ -246,13 +244,12 @@ export const validateOrderItems = (items: OrderItem[]): boolean => {
 };
 
 export const validateOrderTotals = (order: Partial<Order>): boolean => {
-  if (!order.items || !order.subtotal || !order.fees || typeof order.taxes !== 'number' || !order.totalAmount) {
+  if (!order.items || !order.subtotal || typeof order.taxes !== 'number' || !order.totalAmount) {
     return false;
   }
   
   const itemsTotal = order.items.reduce((sum, item) => sum + item.totalPrice, 0);
-  const feesTotal = Object.values(order.fees).reduce((sum, fee) => sum + (fee || 0), 0);
-  const expectedTotal = itemsTotal + feesTotal + order.taxes;
+  const expectedTotal = itemsTotal + order.taxes;
   
   return Math.abs(expectedTotal - order.totalAmount) < 0.01; // Allow for floating point precision
 };
@@ -261,10 +258,9 @@ export const validateOrderStatus = (currentStatus: string, newStatus: string): b
   return isValidStatusTransition(currentStatus, newStatus);
 };
 
-export const calculateOrderTotals = (items: OrderItem[], fees: OrderFees, taxes: number) => {
+export const calculateOrderTotals = (items: OrderItem[], taxes: number) => {
   const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-  const feesTotal = Object.values(fees).reduce((sum, fee) => sum + (fee || 0), 0);
-  const totalAmount = subtotal + feesTotal + taxes;
+  const totalAmount = subtotal + taxes;
   
   return {
     subtotal,
