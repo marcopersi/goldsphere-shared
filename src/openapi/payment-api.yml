@@ -339,7 +339,7 @@ components:
 
     Currency:
       type: string
-      enum: [EUR, USD, GBP, CHF]
+      description: ISO 4217 3-letter currency code
       example: EUR
 
     PaymentMethod:
@@ -408,7 +408,8 @@ components:
           description: Payment amount in cents
           example: 10000
         currency:
-          $ref: '#/components/schemas/Currency'
+          type: string
+          description: ISO 4217 currency code
         status:
           $ref: '#/components/schemas/PaymentIntentStatus'
         orderId:
@@ -489,7 +490,8 @@ components:
           description: Payment amount in cents
           example: 10000
         currency:
-          $ref: '#/components/schemas/Currency'
+          type: string
+          description: ISO 4217 currency code
         orderId:
           type: string
           description: Order ID for this payment
@@ -658,7 +660,8 @@ components:
               type: integer
               example: 5000
             currency:
-              $ref: '#/components/schemas/Currency'
+              type: string
+              description: ISO 4217 currency code
             status:
               type: string
               enum: [pending, succeeded, failed, canceled]
