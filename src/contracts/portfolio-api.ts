@@ -5,11 +5,10 @@ import {
   PositionsResponse,
   PositionQueryParams,
   Transaction,
-  TransactionCreateRequest,
-  TransactionHistoryItem,
   TransactionsResponse,
   TransactionQueryParams,
-  PortfolioSummary
+  PortfolioSummary,
+  PortfolioPositionsResponse
 } from '../types/portfolio';
 import { ApiResponse } from '../types/common';
 import { BaseApiClient, TypedRequest, TypedResponse } from './product-api';
@@ -21,6 +20,11 @@ import { BaseApiClient, TypedRequest, TypedResponse } from './product-api';
 
 // Portfolio API contract - defines all available endpoints
 export interface PortfolioApiContract {
+  // GET /api/portfolios/{portfolioId}/positions (comprehensive)
+  'GET /api/portfolios/{portfolioId}/positions': {
+    params: { portfolioId: string };
+    response: PortfolioPositionsResponse;
+  };
   // GET /positions
   'GET /positions': {
     query?: PositionQueryParams;
@@ -64,12 +68,6 @@ export interface PortfolioApiContract {
     response: Transaction;
   };
   
-  // POST /transactions
-  'POST /transactions': {
-    body: TransactionCreateRequest;
-    response: { success: true; transaction: Transaction; message: string };
-  };
-  
   // GET /portfolio/summary
   'GET /portfolio/summary': {
     response: PortfolioSummary;
@@ -88,7 +86,6 @@ export interface PortfolioApiClient extends BaseApiClient {
   // Transaction operations
   getTransactions(params?: TransactionQueryParams): Promise<ApiResponse<TransactionsResponse>>;
   getTransactionById(transactionId: string): Promise<ApiResponse<Transaction>>;
-  recordTransaction(transaction: TransactionCreateRequest): Promise<ApiResponse<Transaction>>;
   
   // Portfolio operations
   getPortfolioSummary(): Promise<ApiResponse<PortfolioSummary>>;
@@ -135,11 +132,6 @@ export interface PortfolioApiHandlers {
     res: TypedResponse<Transaction>
   ) => Promise<void>;
   
-  recordTransaction: (
-    req: TypedRequest<TransactionCreateRequest>,
-    res: TypedResponse<{ success: true; transaction: Transaction; message: string }>
-  ) => Promise<void>;
-  
   getPortfolioSummary: (
     req: TypedRequest<never, never, never>,
     res: TypedResponse<PortfolioSummary>
@@ -156,9 +148,8 @@ export interface PositionRepository {
 }
 
 export interface TransactionRepository {
-  findByUserId(userId: string, params: TransactionQueryParams): Promise<{ transactions: TransactionHistoryItem[]; total: number }>;
+  findByUserId(userId: string, params: TransactionQueryParams): Promise<{ transactions: Transaction[]; total: number }>;
   findById(id: string, userId: string): Promise<Transaction | null>;
-  create(transaction: Omit<Transaction, 'id' | 'createdAt'>, userId: string): Promise<Transaction>;
   findByPositionId(positionId: string, userId: string): Promise<Transaction[]>;
 }
 
@@ -175,7 +166,6 @@ export interface PortfolioService {
   closePosition(id: string, userId: string): Promise<void>;
   getTransactions(userId: string, params: TransactionQueryParams): Promise<TransactionsResponse>;
   getTransactionById(id: string, userId: string): Promise<Transaction>;
-  recordTransaction(data: TransactionCreateRequest, userId: string): Promise<Transaction>;
   getPortfolioSummary(userId: string): Promise<PortfolioSummary>;
 }
 

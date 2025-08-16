@@ -411,7 +411,6 @@ export const preWarmEnumCaches = (): void => {
   getProducerCache();
   getOrderTypeCache();
   getOrderStatusCache();
-  console.log('Enum caches pre-warmed successfully');
 };
 
 // =============================================================================
