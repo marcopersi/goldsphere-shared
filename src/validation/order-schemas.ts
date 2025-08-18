@@ -64,7 +64,6 @@ export const OrderItemSchema = z.object({
   quantity: z.number().positive('Quantity must be positive'),
   unitPrice: z.number().positive('Unit price must be positive'),
   totalPrice: z.number().positive('Total price must be positive'),
-  custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
   certificateRequested: z.boolean().default(false)
 });
 
@@ -83,7 +82,6 @@ export const CreateOrderInputSchema = z.object({
   items: z.array(z.object({
     productId: z.string(),
     quantity: z.number().positive('Quantity must be positive'),
-    custodyServiceId: z.string().uuid().optional(),
   })).min(1, 'Order must contain at least one item'),
   // address/payment removed
   custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
@@ -135,6 +133,9 @@ export const OrderSchema = z.object({
   
   // Payment Information
   // removed
+  
+  // Custody Information
+  custodyServiceId: z.string().uuid('Custody Service ID must be a valid UUID').optional(),
   
   // Shipping & Tracking
   tracking: OrderTrackingSchema.optional(),

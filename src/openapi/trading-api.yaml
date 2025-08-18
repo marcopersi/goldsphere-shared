@@ -841,6 +841,10 @@ components:
           type: string
           description: Order currency (ISO 4217)
           example: "USD"
+        custodyServiceId:
+          type: string
+          description: Custody Service identifier for this order
+          example: "5e8f7b2a-3c4d-4a5e-8f7b-2a3c4d5e8f7b"
         tracking:
           type: object
           properties:
@@ -904,10 +908,6 @@ components:
           type: number
           description: Total price for this item
           example: 4201.00
-        custodyServiceId:
-          type: string
-          description: Custody Service identifier for this item
-          example: "5e8f7b2a-3c4d-4a5e-8f7b-2a3c4d5e8f7b"
         certificateRequested:
           type: boolean
           description: Whether a certificate is requested for this item
@@ -926,6 +926,9 @@ components:
         currency:
           type: string
           description: Order currency (ISO 4217)
+        custodyServiceId:
+          type: string
+          description: Optional custody service identifier for this order
         items:
           type: array
           items:
@@ -941,9 +944,6 @@ components:
                 type: integer
                 minimum: 1
                 description: Quantity to order
-              custodyServiceId:
-                type: string
-                description: Optional custody service identifier for this item
           minItems: 1
   # address/payment removed
         notes:
@@ -1030,9 +1030,6 @@ components:
         quantity:
           type: number
           minimum: 1
-        custodyServiceId:
-          type: string
-          format: uuid
 
     UpdateOrderItemRequest:
       type: object
@@ -1040,9 +1037,6 @@ components:
         quantity:
           type: number
           minimum: 1
-        custodyServiceId:
-          type: string
-          format: uuid
 
     OrderUpdateRequest:
       type: object

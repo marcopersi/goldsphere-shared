@@ -39,13 +39,11 @@ export const UpdateOrderStatusRequestSchema = z.object({
 // Legacy schemas for backwards compatibility
 export const AddOrderItemRequestSchema = z.object({
   productId: z.string().uuid(),
-  quantity: z.number().positive(),
-  custodyServiceId: z.string().uuid().optional()
+  quantity: z.number().positive()
 });
 
 export const UpdateOrderItemRequestSchema = z.object({
-  quantity: z.number().positive().optional(),
-  custodyServiceId: z.string().uuid().optional()
+  quantity: z.number().positive().optional()
 });
 
 export const ProcessOrderRequestSchema = z.object({
