@@ -15,6 +15,7 @@ export interface Order {
   totalAmount: number;
   currency: string; // ISO 4217 (e.g., USD)
   // Optional per validation schema
+  custodyServiceId?: string;
   shippingMethod?: ShippingMethod;
   tracking?: {
     carrier: string;
@@ -35,7 +36,6 @@ export interface OrderItem {
   unitPrice: number;
   totalPrice: number;
   // Optional fields per validation schema
-  custodyServiceId?: string;
   certificateRequested?: boolean;
 }
 
@@ -45,7 +45,6 @@ export interface OrderRequest {
   items: {
     productId: string;
     quantity: number;
-    custodyServiceId?: string;
   }[];
   custodyServiceId?: string;
   notes?: string;
