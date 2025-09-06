@@ -87,15 +87,17 @@ export const ProductTypeDatabaseRecordSchema = z.object({
 export const ProducerDatabaseRecordSchema = z.object({
   id: z.string().uuid(),
   producerName: z.string(),
+  countryId: z.string().uuid(),
+  websiteURL: z.string().url().optional(),
   status: z.enum(['active', 'inactive']),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 
-// Country database record schema
+// Country database record schema (unified for issuing countries and producer countries)
 export const CountryDatabaseRecordSchema = z.object({
   id: z.string().uuid(),
-  issuingCountryName: z.string(),
+  countryName: z.string(), // Unified name field (was: issuingCountryName)
   isoCode2: z.string().length(2),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

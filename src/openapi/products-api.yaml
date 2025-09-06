@@ -113,9 +113,9 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: issuingCountryId
+        - name: countryId
           in: query
-          description: Filter by issuing country ID (UUID)
+          description: Filter by country ID (UUID) - unified naming
           required: false
           schema:
             type: string
