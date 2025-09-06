@@ -39,6 +39,7 @@ export const CurrencyReferenceSchema = z.object({
 export const ProducerReferenceSchema = z.object({
   id: z.string(),   // UUID for database records, enum-based ID for enum values
   name: z.string(), // Producer name
+  status: z.enum(['active', 'inactive']), // Producer status
 });
 
 // Custodian reference schema (enum-based)
@@ -86,6 +87,7 @@ export const ProductTypeDatabaseRecordSchema = z.object({
 export const ProducerDatabaseRecordSchema = z.object({
   id: z.string().uuid(),
   producerName: z.string(),
+  status: z.enum(['active', 'inactive']),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });

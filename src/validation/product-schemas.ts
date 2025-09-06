@@ -12,14 +12,6 @@ export const MetalObjectSchema = z.object({
   symbol: z.string().length(2)
 });
 
-// Specifications schema (extended to match database fields)
-export const SpecificationsSchema = z.object({
-  diameter: z.number().positive().optional(),
-  thickness: z.number().positive().optional(), 
-  mintage: z.number().int().positive().optional(),
-  certification: z.string().max(255).optional(),
-}).passthrough(); // Allow additional properties
-
 // Core Product schema (aligned with database structure)
 export const ProductSchema = z.object({
   id: z.string().uuid(),
@@ -65,15 +57,13 @@ export const ProductSchema = z.object({
   stockQuantity: z.number().int().min(0).optional(),
   minimumOrderQuantity: z.number().int().min(1),
   
-  // Extended specifications (database fields)
-  specifications: SpecificationsSchema.optional(),
-  diameter: z.number().positive().optional(), // Also as top-level field
-  thickness: z.number().positive().optional(), // Also as top-level field  
-  mintage: z.number().int().positive().optional(), // Also as top-level field
-  certification: z.string().max(255).optional(), // Also as top-level field
+  // Physical specifications (direct fields)
+  diameter: z.number().positive().optional(),
+  thickness: z.number().positive().optional(),
+  mintage: z.number().int().positive().optional(),
+  certification: z.string().max(255).optional(),
   
   // Metadata
-  tags: z.array(z.string().max(50)).optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -104,13 +94,11 @@ export const ProductRegistrationRequestSchema = z.object({
   stockQuantity: z.number().int().min(0).default(0),
   minimumOrderQuantity: z.number().int().min(1).default(1),
   
-  // Specifications
+  // Physical specifications
   diameter: z.number().positive().optional(),
   thickness: z.number().positive().optional(),
   mintage: z.number().int().positive().optional(), 
   certification: z.string().max(255).optional(),
-  
-  tags: z.array(z.string().max(50)).max(20).optional(),
 });
 
 // Product Update schema (all fields optional except validation rules)
@@ -144,13 +132,11 @@ export const ProductUpdateRequestSchema = z.object({
   stockQuantity: z.number().int().min(0).optional(),
   minimumOrderQuantity: z.number().int().min(1).optional(),
   
-  // Specifications
+  // Physical specifications
   diameter: z.number().positive().optional(),
   thickness: z.number().positive().optional(),
   mintage: z.number().int().positive().optional(),
   certification: z.string().max(255).optional(),
-  
-  tags: z.array(z.string().max(50)).max(20).optional(),
 });
 
 // Enhanced query parameters schema
@@ -306,7 +292,6 @@ export const ProductDatabaseRowSchema = z.object({
   thickness: z.string().nullable(),
   mintage: z.number().nullable(),
   certification: z.string().nullable(),
-  tags: z.array(z.string()).nullable(),
   createdat: z.string(),   // Database returns as string
   updatedat: z.string(),   // Database returns as string
 });

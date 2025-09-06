@@ -526,26 +526,6 @@ components:
           type: string
           description: Detailed product description
           example: "Official 1 oz American Gold Eagle coin from the US Mint..."
-        specifications:
-          type: object
-          description: Additional technical specifications
-          properties:
-            diameter:
-              type: number
-              description: Diameter in millimeters
-              example: 32.7
-            thickness:
-              type: number
-              description: Thickness in millimeters
-              example: 2.87
-            mintage:
-              type: integer
-              description: Total number minted
-              example: 500000
-            certification:
-              type: string
-              description: Certification details
-              example: "NGC MS70"
         imageUrl:
           type: string
           format: uri
@@ -570,12 +550,6 @@ components:
           minimum: 0
           description: Premium over spot price as percentage
           example: 5.5
-        tags:
-          type: array
-          items:
-            type: string
-          description: Product tags for categorization
-          example: ["investment", "collectible", "popular"]
         createdAt:
           type: string
           format: date-time
@@ -652,9 +626,6 @@ components:
           type: string
           maxLength: 2000
           description: Detailed product description
-        specifications:
-          type: object
-          description: Additional technical specifications
         inStock:
           type: boolean
           description: Whether product is currently in stock
@@ -672,11 +643,6 @@ components:
           type: number
           minimum: 0
           description: Premium over spot price as percentage
-        tags:
-          type: array
-          items:
-            type: string
-          description: Product tags for categorization
 
     ProductUpdateRequest:
       type: object
@@ -694,9 +660,6 @@ components:
           type: string
           maxLength: 2000
           description: Detailed product description
-        specifications:
-          type: object
-          description: Additional technical specifications
         inStock:
           type: boolean
           description: Whether product is currently in stock
@@ -712,11 +675,6 @@ components:
           type: number
           minimum: 0
           description: Premium over spot price as percentage
-        tags:
-          type: array
-          items:
-            type: string
-          description: Product tags for categorization
 
     Pagination:
       type: object
