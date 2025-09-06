@@ -13,7 +13,7 @@ export const ProductCreateRequestSchema = z.object({
   productName: z.string().min(1, 'Product name is required'),
   productTypeId: z.string().uuid('Invalid product type ID'),
   metalId: z.string().uuid('Invalid metal ID'),
-  issuingCountryId: z.string().uuid('Invalid country ID').optional(),
+  countryId: z.string().uuid('Invalid country ID').optional(), // Unified naming (was: issuingCountryId)
   producerId: z.string().uuid('Invalid producer ID'),
   fineWeight: z.number().positive('Weight must be positive'),
   unitOfMeasure: z.string().min(1, 'Unit of measure is required'),

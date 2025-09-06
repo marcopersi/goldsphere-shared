@@ -29,9 +29,9 @@ export const ProductSchema = z.object({
   producer: z.string().min(1).max(255), // Producer name for API
   producerId: z.string().uuid(), // Database foreign key
   
-  // Country information (optional)
+  // Country information (optional) - unified naming
   country: CountryEnumSchema.optional(),
-  issuingCountryId: z.string().uuid().optional(), // Database foreign key
+  countryId: z.string().uuid().optional(), // Database foreign key (was: issuingCountryId)
   
   // Physical characteristics
   weight: z.number().positive(),
@@ -74,7 +74,7 @@ export const ProductRegistrationRequestSchema = z.object({
   productTypeId: z.string().uuid(), // Require database ID for creation
   metalId: z.string().uuid(),       // Require database ID for creation  
   producerId: z.string().uuid(),    // Require database ID for creation
-  issuingCountryId: z.string().uuid().optional(),
+  countryId: z.string().uuid().optional(), // Unified naming (was: issuingCountryId)
   
   weight: z.number().positive(),
   weightUnit: WeightUnitSchema.default('troy_ounces'),
@@ -109,7 +109,7 @@ export const ProductUpdateRequestSchema = z.object({
   productTypeId: z.string().uuid().optional(),
   metalId: z.string().uuid().optional(),
   producerId: z.string().uuid().optional(),
-  issuingCountryId: z.string().uuid().optional(),
+  countryId: z.string().uuid().optional(), // Unified naming (was: issuingCountryId)
   
   // Physical characteristics
   weight: z.number().positive().optional(),
@@ -149,7 +149,7 @@ export const ProductQueryParamsSchema = z.object({
   metalId: z.string().uuid().optional(),
   productTypeId: z.string().uuid().optional(), 
   producerId: z.string().uuid().optional(),
-  issuingCountryId: z.string().uuid().optional(),
+  countryId: z.string().uuid().optional(), // Unified naming (was: issuingCountryId)
   
   // Filter by enum values (user-friendly)
   metal: MetalEnumSchema.optional(),
@@ -272,7 +272,7 @@ export const ProductDatabaseRowSchema = z.object({
   metalsymbol: z.string(), // From JOIN
   producerid: z.string().uuid(),
   producer: z.string(),    // From JOIN
-  issuingcountryid: z.string().uuid().nullable(),
+  countryid: z.string().uuid().nullable(), // Unified naming (was: issuingcountryid)
   countrycode: z.string().nullable(), // From JOIN
   weight: z.string(),      // Database returns as string
   weightunit: z.string(),

@@ -12,6 +12,8 @@ export const ProducerCreateRequestSchema = z.object({
     .min(1, 'Producer name is required')
     .max(255, 'Producer name too long')
     .trim(),
+  countryId: z.string().uuid('Country ID must be a valid UUID'),
+  websiteURL: z.string().url('Must be a valid URL').optional(),
   status: z.enum(['active', 'inactive'], {
     errorMap: () => ({ message: 'Status must be either active or inactive' })
   }).optional().default('active')
@@ -35,6 +37,8 @@ export const ProducerApiResponseSchema = z.object({
   data: z.object({
     id: z.string().uuid(),
     producerName: z.string(),
+    countryId: z.string().uuid(),
+    websiteURL: z.string().url().optional(),
     status: z.enum(['active', 'inactive']),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime()
@@ -48,6 +52,8 @@ export const ProducerApiListResponseSchema = z.object({
     producers: z.array(z.object({
       id: z.string().uuid(),
       producerName: z.string(),
+      countryId: z.string().uuid(),
+      websiteURL: z.string().url().optional(),
       status: z.enum(['active', 'inactive']),
       createdAt: z.string().datetime(),
       updatedAt: z.string().datetime()
