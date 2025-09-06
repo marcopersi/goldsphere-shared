@@ -411,6 +411,22 @@ export {
 
 export { type Producer as ProducerEntity } from './schemas/producer/producer-types';
 
+// Country exports  
+export { 
+  CountryCreateRequestSchema,
+  CountryUpdateRequestSchema,
+  CountriesQuerySchema,
+  CountryApiResponseSchema,
+  CountryApiListResponseSchema,
+  type CountryCreateRequest,
+  type CountryUpdateRequest,
+  type CountriesQuery,
+  type CountryApiResponse,
+  type CountryApiListResponse
+} from './schemas/country/country-schemas';
+
+export { type Country as CountryEntity } from './schemas/country/country-types';
+
 // Product exports
 export {
   ProductCreateRequestSchema,

@@ -27,6 +27,7 @@ export const ProducersQuerySchema = z.object({
   limit: z.string().optional().transform(val => val ? Math.min(100, Math.max(1, parseInt(val))) || 20 : 20),
   search: z.string().optional(),
   status: z.enum(['active', 'inactive']).optional(),
+  countryId: z.string().uuid('Country ID must be a valid UUID').optional(), // Allow filtering by country
   sortBy: z.enum(['name', 'status', 'createdAt', 'updatedAt']).optional().default('name'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc')
 });
