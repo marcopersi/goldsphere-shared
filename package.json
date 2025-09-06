@@ -1,6 +1,6 @@
 {
   "name": "@marcopersi/shared",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Pure TypeScript library with shared types, Zod schemas, and OpenAPI contracts for GoldSphere precious metals platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
     "build:watch": "tsc --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-  "lint": "eslint src --ext .ts",
+    "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "ci": "npm run lint && npm run type-check && npm run build",
