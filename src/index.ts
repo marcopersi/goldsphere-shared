@@ -389,6 +389,85 @@ export {
 export { z } from 'zod';
 
 // =============================================================================
+// NEW ENHANCED SCHEMAS AND TYPES - Consolidated for frontend/backend consistency
+// =============================================================================
+
+// OrderSource Schema (simplified Zod enum)
+export { OrderSourceSchema, type OrderSourceType } from './schemas/order/order-source-schema';
+
+// Producer exports
+export { 
+  ProducerCreateRequestSchema,
+  ProducerUpdateRequestSchema,
+  ProducersQuerySchema,
+  ProducerApiResponseSchema,
+  ProducerApiListResponseSchema,
+  type ProducerCreateRequest,
+  type ProducerUpdateRequest,
+  type ProducersQuery,
+  type ProducerApiResponse,
+  type ProducerApiListResponse
+} from './schemas/producer/producer-schemas';
+
+export { type Producer as ProducerEntity } from './schemas/producer/producer-types';
+
+// Product exports
+export {
+  ProductCreateRequestSchema,
+  ProductUpdateRequestSchema,
+  ProductsQuerySchema,
+  ProductApiResponseSchema,
+  ProductApiListResponseSchema,
+  type ProductCreateRequest,
+  type ProductUpdateRequest,
+  type ProductsQuery,
+  type ProductApiResponse,
+  type ProductApiListResponse
+} from './schemas/product/product-schemas';
+
+export { type ProductDetails } from './schemas/product/product-types';
+
+// Enhanced API Response patterns
+export {
+  type ApiResponse,
+  type PaginationResponse,
+  type ApiListResponse
+} from './schemas/common/api-response-schemas';
+
+// Portfolio exports
+export {
+  PortfolioSchema,
+  CreatePortfolioRequestSchema,
+  UpdatePortfolioRequestSchema,
+  PortfoliosQuerySchema,
+  type Portfolio as PortfolioSchemaType,
+  type CreatePortfolioRequest,
+  type UpdatePortfolioRequest,
+  type PortfoliosQuery
+} from './schemas/portfolio/portfolio-schemas';
+
+export { 
+  type Portfolio as PortfolioEntity,
+  type PortfolioWithPositions 
+} from './schemas/portfolio/portfolio-types';
+
+// User Management exports
+export {
+  CreateUserRequestSchema,
+  UpdateUserRequestSchema,
+  type CreateUserRequest,
+  type UpdateUserRequest
+} from './schemas/user/user-schemas';
+
+// Transaction exports
+export {
+  TransactionQueryParamsSchema,
+  CreateTransactionRequestSchema,
+  type TransactionQuery,
+  type CreateTransactionRequest
+} from './schemas/transaction/transaction-schemas';
+
+// =============================================================================
 // PACKAGE METADATA
 // =============================================================================
-export const GOLDSPHERE_SHARED_VERSION = '1.3.4';
+export const GOLDSPHERE_SHARED_VERSION = '1.4.0'; // Version bump for new consolidated types
