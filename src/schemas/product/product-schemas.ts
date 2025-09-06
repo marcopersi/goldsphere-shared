@@ -30,8 +30,7 @@ export const ProductCreateRequestSchema = z.object({
   diameter: z.number().positive('Diameter must be positive').optional(),
   thickness: z.number().positive('Thickness must be positive').optional(),
   mintage: z.number().int().positive('Mintage must be positive').optional(),
-  certification: z.string().optional(),
-  tags: z.array(z.string()).optional()
+  certification: z.string().optional()
 });
 
 export const ProductUpdateRequestSchema = ProductCreateRequestSchema.partial();

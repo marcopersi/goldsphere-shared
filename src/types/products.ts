@@ -15,13 +15,11 @@ export interface Product {
   country?: Country;
   year?: number;
   description?: string;
-  specifications?: Record<string, any>;
   imageUrl: string;
   inStock: boolean;
   stockQuantity?: number;
   minimumOrderQuantity: number;
   premiumPercentage?: number;
-  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,24 +37,20 @@ export interface ProductRegistrationRequest {
   country?: Country;
   year?: number;
   description?: string;
-  specifications?: Record<string, any>;
   inStock?: boolean;
   stockQuantity?: number;
   minimumOrderQuantity?: number;
   premiumPercentage?: number;
-  tags?: string[];
 }
 
 export interface ProductUpdateRequest {
   name?: string;
   price?: number;
   description?: string;
-  specifications?: Record<string, any>;
   inStock?: boolean;
   stockQuantity?: number;
   minimumOrderQuantity?: number;
   premiumPercentage?: number;
-  tags?: string[];
 }
 
 export interface ProductsResponse {

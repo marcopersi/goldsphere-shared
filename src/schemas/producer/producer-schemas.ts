@@ -11,7 +11,10 @@ export const ProducerCreateRequestSchema = z.object({
   producerName: z.string()
     .min(1, 'Producer name is required')
     .max(255, 'Producer name too long')
-    .trim()
+    .trim(),
+  status: z.enum(['active', 'inactive'], {
+    errorMap: () => ({ message: 'Status must be either active or inactive' })
+  }).optional().default('active')
 });
 
 export const ProducerUpdateRequestSchema = ProducerCreateRequestSchema.partial();
@@ -21,7 +24,8 @@ export const ProducersQuerySchema = z.object({
   page: z.string().optional().transform(val => val ? Math.max(1, parseInt(val)) || 1 : 1),
   limit: z.string().optional().transform(val => val ? Math.min(100, Math.max(1, parseInt(val))) || 20 : 20),
   search: z.string().optional(),
-  sortBy: z.enum(['name', 'createdAt', 'updatedAt']).optional().default('name'),
+  status: z.enum(['active', 'inactive']).optional(),
+  sortBy: z.enum(['name', 'status', 'createdAt', 'updatedAt']).optional().default('name'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc')
 });
 
@@ -31,6 +35,7 @@ export const ProducerApiResponseSchema = z.object({
   data: z.object({
     id: z.string().uuid(),
     producerName: z.string(),
+    status: z.enum(['active', 'inactive']),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime()
   }),
@@ -43,6 +48,7 @@ export const ProducerApiListResponseSchema = z.object({
     producers: z.array(z.object({
       id: z.string().uuid(),
       producerName: z.string(),
+      status: z.enum(['active', 'inactive']),
       createdAt: z.string().datetime(),
       updatedAt: z.string().datetime()
     })),

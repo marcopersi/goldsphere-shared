@@ -15,6 +15,5 @@ export interface ProductDetails extends Product {
   thickness?: number;
   mintage?: number;
   certification?: string;
-  tags?: string[];
   // Add more detailed fields as needed
 }
