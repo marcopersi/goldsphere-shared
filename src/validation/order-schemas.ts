@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 import { OrderType, OrderStatus } from '../enums';
-import { OrderTypeEnumSchema, OrderStatusEnumSchema } from './enum-schemas';
+import { OrderTypeEnumSchema, OrderStatusEnumSchema, OrderSourceEnumSchema } from './enum-schemas';
 
 // Helper functions for order validation
 export const validateOrderType = (value: string): OrderType | undefined => {
@@ -118,6 +118,7 @@ export const OrderSchema = z.object({
   userId: z.string().uuid('User ID must be a valid UUID'),
   type: OrderTypeEnumSchema, // References OrderType enum (buy, sell)
   status: OrderStatusEnumSchema,
+  source: OrderSourceEnumSchema, // References OrderSource enum (WEB, MOBILE, API, etc.)
   
   // Order Items
   items: z.array(OrderItemSchema).min(1, 'Order must contain at least one item'),
@@ -143,7 +144,6 @@ export const OrderSchema = z.object({
   
   
   // Additional Information
-  source: z.enum(['web', 'mobile', 'api', 'admin', 'phone']).default('web'),
   notes: z.string().optional(),
   
   // Timestamps

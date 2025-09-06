@@ -13,6 +13,7 @@ export { Currency } from './currency';
 export { Producer } from './producer';
 export { OrderType } from './order-type';
 export { OrderStatus } from './order-status';
+export { OrderSource } from './order-source';
 export { Custodian } from './custodian';
 export { PaymentFrequency } from './payment-frequency';
 export { CustodyServiceType } from './custody-service-type';

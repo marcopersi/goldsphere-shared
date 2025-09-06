@@ -63,6 +63,7 @@ export { Currency as CurrencyEnum } from './enums/currency';
 export { Producer } from './enums/producer';
 export { OrderType } from './enums/order-type';
 export { OrderStatus } from './enums/order-status';
+export { OrderSource } from './enums/order-source';
 export { Custodian } from './enums/custodian';
 export { PaymentFrequency } from './enums/payment-frequency';
 export { CustodyServiceType } from './enums/custody-service-type';
@@ -88,7 +89,8 @@ export {
   CurrencyEnumSchema,
   ProducerEnumSchema,
   OrderTypeEnumSchema,
-  OrderStatusEnumSchema
+  OrderStatusEnumSchema,
+  OrderSourceEnumSchema
 } from './validation/enum-schemas';
 
 // Custody validation schemas - Export with explicit naming

@@ -1,6 +1,6 @@
 // Trading API Types
 import { PaginationInfo } from './common';
-import { Metal } from '../enums';
+import { Metal, OrderSource } from '../enums';
 import type { ShippingMethod } from '../validation/order-schemas';
 
 export interface Order {
@@ -9,6 +9,7 @@ export interface Order {
   userId: string;
   type: 'buy' | 'sell';
   status: string; // e.g., 'pending', 'processing', 'shipped', 'delivered', 'cancelled', etc.
+  source: OrderSource;
   items: OrderItem[];
   subtotal: number;
   taxes: number;
