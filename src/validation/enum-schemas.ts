@@ -19,6 +19,7 @@ let _currencyCache: { countryCodes: Set<string>; isoCodes: Set<string>; numericC
 let _producerCache: { codes: Set<string>; names: Set<string> } | null = null;
 let _orderTypeCache: Set<string> | null = null;
 let _orderStatusCache: Set<string> | null = null;
+let _orderSourceCache: Set<string> | null = null;
 
 // Lazy initialization functions for caches
 const getMetalCache = () => {
@@ -147,6 +148,20 @@ const getOrderStatusCache = () => {
   return _orderStatusCache;
 };
 
+const getOrderSourceCache = () => {
+  if (!_orderSourceCache) {
+    try {
+      const { OrderSource } = require('../enums');
+      const values = OrderSource.values();
+      _orderSourceCache = new Set(values.map((os: any) => os.value.toLowerCase()));
+    } catch (error) {
+      console.warn('Failed to load OrderSource enum, falling back to hardcoded values', error);
+      _orderSourceCache = new Set(['web', 'mobile', 'api', 'admin', 'import', 'phone']);
+    }
+  }
+  return _orderSourceCache;
+};
+
 // =============================================================================
 // OPTIMIZED ENUM VALIDATION SCHEMAS
 // =============================================================================
@@ -235,6 +250,18 @@ export const OrderStatusEnumSchema = z.string().refine(
   },
   {
     message: "Invalid order status. Must be one of: pending, processing, shipped, delivered, cancelled"
+  }
+);
+
+// Order source validation (channel-focused)
+export const OrderSourceEnumSchema = z.string().refine(
+  (value) => {
+    const cache = getOrderSourceCache();
+    const normalized = value.toLowerCase().trim();
+    return cache.has(normalized);
+  },
+  {
+    message: "Invalid order source. Must be one of: web, mobile, api, admin, import, phone"
   }
 );
 
@@ -340,6 +367,19 @@ export const getOrderStatusByValue = (value: string): any => {
   }
 };
 
+export const getOrderSourceByValue = (value: string): any => {
+  try {
+    const { OrderSource } = require('../enums');
+    const normalized = value.toLowerCase().trim();
+    return OrderSource.values().find((orderSource: any) => 
+      orderSource.value.toLowerCase() === normalized
+    );
+  } catch (error) {
+    console.warn('Failed to load OrderSource enum for lookup', error);
+    return undefined;
+  }
+};
+
 // =============================================================================
 // API ABSTRACTION SCHEMAS
 // =============================================================================
@@ -400,6 +440,7 @@ export const clearEnumCaches = (): void => {
   _producerCache = null;
   _orderTypeCache = null;
   _orderStatusCache = null;
+  _orderSourceCache = null;
 };
 
 // Function to pre-warm caches (useful for production startup)
@@ -411,6 +452,7 @@ export const preWarmEnumCaches = (): void => {
   getProducerCache();
   getOrderTypeCache();
   getOrderStatusCache();
+  getOrderSourceCache();
 };
 
 // =============================================================================
@@ -431,6 +473,13 @@ export const OrderTypeInstanceSchema = z.object({
 });
 
 export const OrderStatusInstanceSchema = z.object({
+  value: z.string(),
+  displayName: z.string(),
+  description: z.string(),
+  toString: z.function().optional()
+});
+
+export const OrderSourceInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
   description: z.string(),
@@ -512,6 +561,16 @@ export const OrderStatus = (() => {
   }
 })();
 
+export const OrderSource = (() => {
+  try {
+    const enums = require('../enums');
+    return enums.OrderSource;
+  } catch (error) {
+    console.warn('Failed to load enum classes (OrderSource)', error);
+    return undefined;
+  }
+})();
+
 // =============================================================================
 // TYPE EXPORTS
 // =============================================================================
@@ -520,3 +579,4 @@ export type MetalApiType = z.infer<typeof MetalApiSchema>;
 export type CurrencyApiType = z.infer<typeof CurrencyApiSchema>;
 export type OrderTypeApiType = z.infer<typeof OrderTypeApiSchema>;
 export type OrderStatusApiType = z.infer<typeof OrderStatusApiSchema>;
+export type OrderSourceApiType = z.infer<typeof OrderSourceEnumSchema>;

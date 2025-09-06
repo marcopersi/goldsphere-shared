@@ -781,6 +781,18 @@ components:
       bearerFormat: JWT
 
   schemas:
+    OrderSource:
+      type: string
+      enum:
+        - WEB
+        - MOBILE
+        - API
+        - ADMIN
+        - IMPORT
+        - PHONE
+      description: Source of the order creation
+      example: "WEB"
+    
     OrderResponse:
       type: object
       properties:
@@ -796,6 +808,7 @@ components:
         - userId
         - type
         - status
+        - source
         - items
         - totalAmount
         - currency
@@ -820,6 +833,9 @@ components:
           enum: [pending, processing, shipped, delivered, cancelled]
           description: Current order status
           example: "pending"
+        source:
+          $ref: '#/components/schemas/OrderSource'
+          description: Source of the order creation
         items:
           type: array
           items:
