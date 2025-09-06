@@ -1,14 +1,14 @@
 // Trading API Types
 import { PaginationInfo } from './common';
-import { Metal, OrderSource } from '../enums';
+import { Metal, OrderSource, OrderType, OrderStatus } from '../enums';
 import type { ShippingMethod } from '../validation/order-schemas';
 
 export interface Order {
   id: string;
   orderNumber: string;
   userId: string;
-  type: 'buy' | 'sell';
-  status: string; // e.g., 'pending', 'processing', 'shipped', 'delivered', 'cancelled', etc.
+  type: OrderType;
+  status: OrderStatus;
   source: OrderSource;
   items: OrderItem[];
   subtotal: number;
