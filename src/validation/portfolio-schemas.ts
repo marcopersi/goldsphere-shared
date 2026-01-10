@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ProducerEnumSchema, MetalEnumSchema } from './enum-schemas';
+import { MetalEnumSchema } from './enum-schemas';
 import { PaymentFrequencyEnumSchema } from './custody-schemas';
 import { ProductSchema } from './product-schemas';
 import { CommonPaginationSchema } from './common-schemas';
@@ -118,7 +118,6 @@ export const PositionQueryParamsSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20).optional(),
   status: PositionStatusSchema.optional(),
   metal: MetalEnumSchema.optional(),
-  producer: ProducerEnumSchema.optional(),
 });
 
 export const TransactionQueryParamsSchema = z.object({

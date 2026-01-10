@@ -5,7 +5,7 @@
  * such as metals, product types, countries, currencies, and producers.
  */
 
-import { Metal, ProductType, Country, Currency, Producer, Custodian, PaymentFrequency, CustodyServiceType } from '../enums';
+import { Metal, ProductType, Country, Currency, Custodian, PaymentFrequency, CustodyServiceType } from '../enums';
 
 // Reference Data Response Types
 export interface MetalReference {
@@ -26,12 +26,6 @@ export interface CurrencyReference {
   countryCode: string;
   isoCode3: string;
   isoNumericCode: number;
-}
-
-export interface ProducerReference {
-  code: string;
-  name: string;
-  countryCode: string;
 }
 
 export interface CustodianReference {
@@ -58,7 +52,6 @@ export interface ReferenceDataResponse {
     productTypes: ProductTypeReference[];
     countries: CountryReference[];
     currencies: CurrencyReference[];
-    producers: ProducerReference[];
     custodians: CustodianReference[];
     paymentFrequencies: PaymentFrequencyReference[];
     custodyServiceTypes: CustodyServiceTypeReference[];
@@ -87,12 +80,6 @@ export interface CountriesResponse {
 export interface CurrenciesResponse {
   success: boolean;
   data: CurrencyReference[];
-  error?: string;
-}
-
-export interface ProducersResponse {
-  success: boolean;
-  data: ProducerReference[];
   error?: string;
 }
 
@@ -140,16 +127,6 @@ export interface ReferenceDataApiContract {
    * Get all supported currencies
    */
   getCurrencies(): Promise<CurrenciesResponse>;
-
-  /**
-   * Get all producers/mints
-   */
-  getProducers(): Promise<ProducersResponse>;
-
-  /**
-   * Get producers by country
-   */
-  getProducersByCountry(countryCode: string): Promise<ProducersResponse>;
 }
 
 // API Client Interface
@@ -162,8 +139,6 @@ export interface ReferenceDataApiClient {
   getProductTypes(): Promise<ProductTypesResponse>;
   getCountries(): Promise<CountriesResponse>;
   getCurrencies(): Promise<CurrenciesResponse>;
-  getProducers(): Promise<ProducersResponse>;
-  getProducersByCountry(countryCode: string): Promise<ProducersResponse>;
   getCustodians(): Promise<CustodiansResponse>;
   getPaymentFrequencies(): Promise<PaymentFrequenciesResponse>;
   getCustodyServiceTypes(): Promise<CustodyServiceTypesResponse>;
@@ -197,16 +172,6 @@ export interface ReferenceDataService {
   getCurrencies(): CurrencyReference[];
 
   /**
-   * Get producers reference data
-   */
-  getProducers(): ProducerReference[];
-
-  /**
-   * Get producers by country
-   */
-  getProducersByCountry(countryCode: string): ProducerReference[];
-
-  /**
    * Get custodians reference data
    */
   getCustodians(): CustodianReference[];
@@ -228,7 +193,6 @@ export interface ReferenceDataService {
   getProductTypeByValue(value: string): ProductType | undefined;
   getCountryByValue(value: string): Country | undefined;
   getCurrencyByValue(value: string): Currency | undefined;
-  getProducerByValue(value: string): Producer | undefined;
 }
 
 // Default Implementation Helper
@@ -241,7 +205,6 @@ export class DefaultReferenceDataService implements ReferenceDataService {
         productTypes: this.getProductTypes(),
         countries: this.getCountries(),
         currencies: this.getCurrencies(),
-        producers: this.getProducers(),
         custodians: this.getCustodians(),
         paymentFrequencies: this.getPaymentFrequencies(),
         custodyServiceTypes: this.getCustodyServiceTypes(),
@@ -263,14 +226,6 @@ export class DefaultReferenceDataService implements ReferenceDataService {
 
   getCurrencies(): CurrencyReference[] {
     return Currency.values().map((currency: Currency) => currency.toJSON());
-  }
-
-  getProducers(): ProducerReference[] {
-    return Producer.values().map((producer: Producer) => producer.toJSON());
-  }
-
-  getProducersByCountry(countryCode: string): ProducerReference[] {
-    return Producer.fromCountry(countryCode).map((producer: Producer) => producer.toJSON());
   }
 
   getCustodians(): CustodianReference[] {
@@ -321,10 +276,6 @@ export class DefaultReferenceDataService implements ReferenceDataService {
     return Currency.fromIsoCode3(value) || Currency.fromCountryCode(value) || 
            Currency.fromNumericCode(parseInt(value, 10));
   }
-
-  getProducerByValue(value: string): Producer | undefined {
-    return Producer.fromCode(value) || Producer.fromName(value);
-  }
 }
 
 // API Endpoints Constants
@@ -333,9 +284,7 @@ export const REFERENCE_DATA_ENDPOINTS = {
   METALS: '/api/reference-data/metals',
   PRODUCT_TYPES: '/api/reference-data/product-types',
   COUNTRIES: '/api/reference-data/countries',
-  CURRENCIES: '/api/reference-data/currencies',
-  PRODUCERS: '/api/reference-data/producers',
-  PRODUCERS_BY_COUNTRY: '/api/reference-data/producers/country/:countryCode'
+  CURRENCIES: '/api/reference-data/currencies'
 } as const;
 
 export type ReferenceDataEndpoint = typeof REFERENCE_DATA_ENDPOINTS[keyof typeof REFERENCE_DATA_ENDPOINTS];

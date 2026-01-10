@@ -3,7 +3,6 @@ import {
   ProductType, 
   Country, 
   Currency, 
-  Producer, 
   Custodian, 
   PaymentFrequency, 
   CustodyServiceType 
@@ -16,7 +15,6 @@ export interface ReferenceDataResponse {
     metals: Metal[];
     productTypes: ProductType[];
     countries: Country[];
-    producers: Producer[];
     currencies: Currency[];
     custodians: Custodian[];
     paymentFrequencies: PaymentFrequency[];
@@ -43,11 +41,6 @@ export interface CountriesResponse {
 export interface CurrenciesResponse {
   success: boolean;
   data: Currency[];
-}
-
-export interface ProducersResponse {
-  success: boolean;
-  data: Producer[];
 }
 
 export interface CustodiansResponse {

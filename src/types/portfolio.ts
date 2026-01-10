@@ -1,5 +1,5 @@
 import { PaginationInfo } from './common';
-import { Country, Producer, Metal, PaymentFrequency } from '../enums';
+import { Country, Metal, PaymentFrequency } from '../enums';
 import { Product } from './products';
 import { CustodyService } from '../validation/custody-schemas';
 
@@ -53,7 +53,6 @@ export interface PositionCreateRequest {
   purchasePrice: number;
   quantity: number;
   issuingCountry: Country;
-  producer: Producer;
   certifiedProvenance: boolean;
   notes?: string;
   custodyServiceId: string; // Required for position creation
@@ -95,7 +94,6 @@ export interface PositionQueryParams {
   limit?: number;
   status?: "active" | "closed";
   metal?: Metal;
-  producer?: Producer;
 }
 
 export interface TransactionQueryParams {
