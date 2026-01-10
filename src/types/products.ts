@@ -1,5 +1,5 @@
 import { WeightUnit, PaginationInfo } from './common';
-import { Metal, ProductType, Country, Currency, Producer } from '../enums';
+import { Metal, ProductType, Country, Currency } from '../enums';
 
 export interface Product {
   id: string;
@@ -11,7 +11,6 @@ export interface Product {
   purity: number;
   marketPrice: number;
   currency: Currency;
-  producer: Producer;
   country?: Country;
   year?: number;
   description?: string;
@@ -33,7 +32,6 @@ export interface ProductRegistrationRequest {
   purity: number;
   price: number;
   currency: Currency;
-  producer: Producer;
   country?: Country;
   year?: number;
   description?: string;
@@ -85,5 +83,4 @@ export interface ProductQueryParams {
   limit?: number;
   metal?: Metal;
   type?: ProductType;
-  producer?: Producer;
 }

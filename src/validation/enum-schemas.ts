@@ -16,7 +16,6 @@ let _metalCache: { symbols: Set<string>; names: Set<string> } | null = null;
 let _productTypeCache: Set<string> | null = null;
 let _countryCache: { codes: Set<string>; isoCodes: Set<string>; names: Set<string> } | null = null;
 let _currencyCache: { countryCodes: Set<string>; isoCodes: Set<string>; numericCodes: Set<string> } | null = null;
-let _producerCache: { codes: Set<string>; names: Set<string> } | null = null;
 let _orderTypeCache: Set<string> | null = null;
 let _orderStatusCache: Set<string> | null = null;
 let _orderSourceCache: Set<string> | null = null;
@@ -98,26 +97,6 @@ const getCurrencyCache = () => {
     }
   }
   return _currencyCache;
-};
-
-const getProducerCache = () => {
-  if (!_producerCache) {
-    try {
-      const { Producer } = require('../enums');
-      const values = Producer.values();
-      _producerCache = {
-        codes: new Set(values.map((p: any) => p.code.toLowerCase())),
-        names: new Set(values.map((p: any) => p.name.toLowerCase()))
-      };
-    } catch (error) {
-      console.warn('Failed to load Producer enum, falling back to hardcoded values', error);
-      _producerCache = {
-        codes: new Set(['rcm', 'usmint', 'perth', 'valcambi', 'pamp']),
-        names: new Set(['royal canadian mint', 'us mint', 'perth mint', 'valcambi', 'pamp suisse'])
-      };
-    }
-  }
-  return _producerCache;
 };
 
 const getOrderTypeCache = () => {
@@ -214,18 +193,6 @@ export const CurrencyEnumSchema = z.string().refine(
   },
   {
     message: "Invalid currency. Must be a valid ISO currency code (USD, EUR, GBP, CHF, CAD, AUD)"
-  }
-);
-
-// Producer validation (accepts code OR name)
-export const ProducerEnumSchema = z.string().refine(
-  (value) => {
-    const cache = getProducerCache();
-    const normalized = value.toLowerCase().trim();
-    return cache.codes.has(normalized) || cache.names.has(normalized);
-  },
-  {
-    message: "Invalid producer. Must be a valid producer code or name"
   }
 );
 
@@ -327,20 +294,6 @@ export const getCurrencyByValue = (value: string): any => {
   }
 };
 
-export const getProducerByValue = (value: string): any => {
-  try {
-    const { Producer } = require('../enums');
-    const normalized = value.toLowerCase().trim();
-    return Producer.values().find((producer: any) => 
-      producer.code.toLowerCase() === normalized ||
-      producer.name.toLowerCase() === normalized
-    );
-  } catch (error) {
-    console.warn('Failed to load Producer enum for lookup', error);
-    return undefined;
-  }
-};
-
 export const getOrderTypeByValue = (value: string): any => {
   try {
     const { OrderType } = require('../enums');
@@ -437,7 +390,6 @@ export const clearEnumCaches = (): void => {
   _productTypeCache = null;
   _countryCache = null;
   _currencyCache = null;
-  _producerCache = null;
   _orderTypeCache = null;
   _orderStatusCache = null;
   _orderSourceCache = null;
@@ -449,7 +401,6 @@ export const preWarmEnumCaches = (): void => {
   getProductTypeCache();
   getCountryCache();
   getCurrencyCache();
-  getProducerCache();
   getOrderTypeCache();
   getOrderStatusCache();
   getOrderSourceCache();

@@ -35,13 +35,6 @@ export const CurrencyReferenceSchema = z.object({
   isoNumericCode: z.number().int(),   // Numeric ISO code (840 for USD)
 });
 
-// Producer reference schema (hybrid database + enum structure)
-export const ProducerReferenceSchema = z.object({
-  id: z.string(),   // UUID for database records, enum-based ID for enum values
-  name: z.string(), // Producer name
-  status: z.enum(['active', 'inactive']), // Producer status
-});
-
 // Custodian reference schema (enum-based)
 export const CustodianReferenceSchema = z.object({
   value: z.string(), // Custodian identifier/code
@@ -83,17 +76,6 @@ export const ProductTypeDatabaseRecordSchema = z.object({
   updatedAt: z.coerce.date(),
 });
 
-// Producer database record schema
-export const ProducerDatabaseRecordSchema = z.object({
-  id: z.string().uuid(),
-  producerName: z.string(),
-  countryId: z.string().uuid(),
-  websiteURL: z.string().url().optional(),
-  status: z.enum(['active', 'inactive']),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-});
-
 // Country database record schema (unified for issuing countries and producer countries)
 export const CountryDatabaseRecordSchema = z.object({
   id: z.string().uuid(),
@@ -125,7 +107,6 @@ export const ReferenceDataResponseSchema = z.object({
     productTypes: z.array(ProductTypeReferenceSchema),
     countries: z.array(CountryReferenceSchema),
     currencies: z.array(CurrencyReferenceSchema),
-    producers: z.array(ProducerReferenceSchema), // Hybrid database + enum
     custodians: z.array(CustodianReferenceSchema),
     paymentFrequencies: z.array(PaymentFrequencyReferenceSchema),
     custodyServiceTypes: z.array(CustodyServiceTypeReferenceSchema),
@@ -151,11 +132,6 @@ export const CountriesResponseSchema = z.object({
 export const CurrenciesResponseSchema = z.object({
   success: z.boolean(),
   data: z.array(CurrencyReferenceSchema),
-});
-
-export const ProducersResponseSchema = z.object({
-  success: z.boolean(),
-  data: z.array(ProducerReferenceSchema),
 });
 
 export const CustodiansResponseSchema = z.object({
@@ -192,13 +168,6 @@ export const ProductTypeDatabaseResponseSchema = z.object({
   details: z.string().optional(),
 });
 
-export const ProducerDatabaseResponseSchema = z.object({
-  success: z.boolean(),
-  data: ProducerDatabaseRecordSchema.optional(),
-  error: z.string().optional(),
-  details: z.string().optional(),
-});
-
 export const CountryDatabaseResponseSchema = z.object({
   success: z.boolean(),
   data: CountryDatabaseRecordSchema.optional(),
@@ -221,7 +190,6 @@ export const CurrencyDatabaseResponseSchema = z.object({
 export const BulkReferenceDataUpdateSchema = z.object({
   metals: z.array(MetalDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
   productTypes: z.array(ProductTypeDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
-  producers: z.array(ProducerDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
   countries: z.array(CountryDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
   currencies: z.array(CurrencyDatabaseRecordSchema.omit({ id: true, createdAt: true, updatedAt: true })).optional(),
 });
@@ -246,7 +214,6 @@ export type MetalReference = z.infer<typeof MetalReferenceSchema>;
 export type ProductTypeReference = z.infer<typeof ProductTypeReferenceSchema>;
 export type CountryReference = z.infer<typeof CountryReferenceSchema>;
 export type CurrencyReference = z.infer<typeof CurrencyReferenceSchema>;
-export type ProducerReference = z.infer<typeof ProducerReferenceSchema>;
 export type CustodianReference = z.infer<typeof CustodianReferenceSchema>;
 export type PaymentFrequencyReference = z.infer<typeof PaymentFrequencyReferenceSchema>;
 export type CustodyServiceTypeReference = z.infer<typeof CustodyServiceTypeReferenceSchema>;
@@ -257,7 +224,6 @@ export type MetalsResponse = z.infer<typeof MetalsResponseSchema>;
 export type ProductTypesResponse = z.infer<typeof ProductTypesResponseSchema>;
 export type CountriesResponse = z.infer<typeof CountriesResponseSchema>;
 export type CurrenciesResponse = z.infer<typeof CurrenciesResponseSchema>;
-export type ProducersResponse = z.infer<typeof ProducersResponseSchema>;
 export type CustodiansResponse = z.infer<typeof CustodiansResponseSchema>;
 export type PaymentFrequenciesResponse = z.infer<typeof PaymentFrequenciesResponseSchema>;
 export type CustodyServiceTypesResponse = z.infer<typeof CustodyServiceTypesResponseSchema>;
@@ -265,14 +231,12 @@ export type CustodyServiceTypesResponse = z.infer<typeof CustodyServiceTypesResp
 // Database record types
 export type MetalDatabaseRecord = z.infer<typeof MetalDatabaseRecordSchema>;
 export type ProductTypeDatabaseRecord = z.infer<typeof ProductTypeDatabaseRecordSchema>;
-export type ProducerDatabaseRecord = z.infer<typeof ProducerDatabaseRecordSchema>;
 export type CountryDatabaseRecord = z.infer<typeof CountryDatabaseRecordSchema>;
 export type CurrencyDatabaseRecord = z.infer<typeof CurrencyDatabaseRecordSchema>;
 
 // Database response types
 export type MetalDatabaseResponse = z.infer<typeof MetalDatabaseResponseSchema>;
 export type ProductTypeDatabaseResponse = z.infer<typeof ProductTypeDatabaseResponseSchema>;
-export type ProducerDatabaseResponse = z.infer<typeof ProducerDatabaseResponseSchema>;
 export type CountryDatabaseResponse = z.infer<typeof CountryDatabaseResponseSchema>;
 export type CurrencyDatabaseResponse = z.infer<typeof CurrencyDatabaseResponseSchema>;
 
@@ -285,19 +249,6 @@ export type ReferenceDataError = z.infer<typeof ReferenceDataErrorSchema>;
 // =============================================================================
 // HELPER SCHEMAS FOR VALIDATION
 // =============================================================================
-
-// Validation helper for checking if ID exists in producers list
-export const ProducerIdValidationSchema = z.string().refine(
-  async (id) => {
-    // This would be implemented to check against database + enum values
-    // For now, basic UUID or enum pattern validation
-    return z.string().uuid().safeParse(id).success || 
-           id.startsWith('enum-');
-  },
-  {
-    message: "Invalid producer ID - must be valid UUID or enum-based ID"
-  }
-);
 
 // Validation helper for metal symbols
 export const MetalSymbolValidationSchema = z.string().refine(

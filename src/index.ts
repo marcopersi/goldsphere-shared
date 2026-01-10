@@ -60,7 +60,6 @@ export { Metal } from './enums/metal';
 export { ProductType as ProductTypeEnum } from './enums/product-type';
 export { Country as CountryEnum } from './enums/country';
 export { Currency as CurrencyEnum } from './enums/currency';
-export { Producer } from './enums/producer';
 export { OrderType } from './enums/order-type';
 export { OrderStatus } from './enums/order-status';
 export { OrderSource } from './enums/order-source';
@@ -87,7 +86,6 @@ export {
   ProductTypeEnumSchema,
   CountryEnumSchema,
   CurrencyEnumSchema,
-  ProducerEnumSchema,
   OrderTypeEnumSchema,
   OrderStatusEnumSchema,
   OrderSourceEnumSchema
@@ -248,7 +246,6 @@ export {
   ProductTypeReferenceSchema,
   CountryReferenceSchema,
   CurrencyReferenceSchema,
-  ProducerReferenceSchema,
   CustodianReferenceSchema,
   PaymentFrequencyReferenceSchema,
   CustodyServiceTypeReferenceSchema,
@@ -256,7 +253,6 @@ export {
   CountriesResponseSchema as RefDataCountriesResponseSchema,
   CurrenciesResponseSchema as RefDataCurrenciesResponseSchema,
   ProductTypesResponseSchema as RefDataProductTypesResponseSchema,
-  ProducersResponseSchema as RefDataProducersResponseSchema,
   CustodiansResponseSchema as RefDataCustodiansResponseSchema,
   PaymentFrequenciesResponseSchema as RefDataPaymentFrequenciesResponseSchema,
   CustodyServiceTypesResponseSchema as RefDataCustodyServiceTypesResponseSchema,
@@ -266,7 +262,6 @@ export {
   type ProductTypeReference as RefDataProductTypeReference,
   type CountryReference as RefDataCountryReference,
   type CurrencyReference as RefDataCurrencyReference,
-  type ProducerReference as RefDataProducerReference,
   type CustodianReference as RefDataCustodianReference,
   type PaymentFrequencyReference as RefDataPaymentFrequencyReference,
   type CustodyServiceTypeReference as RefDataCustodyServiceTypeReference,
@@ -275,7 +270,6 @@ export {
   type ProductTypesResponse as RefDataProductTypesResponse,
   type CountriesResponse as RefDataCountriesResponse,
   type CurrenciesResponse as RefDataCurrenciesResponse,
-  type ProducersResponse as RefDataProducersResponse,
   type CustodiansResponse as RefDataCustodiansResponse,
   type PaymentFrequenciesResponse as RefDataPaymentFrequenciesResponse,
   type CustodyServiceTypesResponse as RefDataCustodyServiceTypesResponse
@@ -394,22 +388,6 @@ export { z } from 'zod';
 
 // OrderSource Schema (simplified Zod enum)
 export { OrderSourceSchema, type OrderSourceType } from './schemas/order/order-source-schema';
-
-// Producer exports
-export { 
-  ProducerCreateRequestSchema,
-  ProducerUpdateRequestSchema,
-  ProducersQuerySchema,
-  ProducerApiResponseSchema,
-  ProducerApiListResponseSchema,
-  type ProducerCreateRequest,
-  type ProducerUpdateRequest,
-  type ProducersQuery,
-  type ProducerApiResponse,
-  type ProducerApiListResponse
-} from './schemas/producer/producer-schemas';
-
-export { type Producer as ProducerEntity } from './schemas/producer/producer-types';
 
 // Country exports  
 export { 
