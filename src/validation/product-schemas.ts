@@ -176,7 +176,7 @@ export const ProductsResponseSchema = z.object({
     filters: z.object({
       totalCount: z.number().int(),
       filteredCount: z.number().int(),
-      appliedFilters: z.record(z.any()).optional(),
+      appliedFilters: z.record(z.string(), z.any()).optional(),
     }).optional(),
   }),
 });
@@ -238,7 +238,7 @@ export const ApiSuccessSchema = z.object({
   success: z.literal(true),
   data: z.any().optional(),
   message: z.string().optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 // =============================================================================
