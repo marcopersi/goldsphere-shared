@@ -55,7 +55,7 @@ export const PaymentIntentSchema = z.object({
   orderId: z.string().optional(),
   customerId: z.string().optional(),
   paymentMethodId: z.string().optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
   // Timestamps
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -86,7 +86,7 @@ export const CreatePaymentIntentRequestSchema = z.object({
     allowRedirects: z.enum(['always', 'never']).optional()
   }).optional(),
   description: z.string().max(1000).optional(),
-  metadata: z.record(z.string()).optional()
+  metadata: z.record(z.string(), z.string()).optional()
 });
 
 export const ConfirmPaymentRequestSchema = z.object({
@@ -106,7 +106,7 @@ export const RefundRequestSchema = z.object({
   paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
   amount: z.number().int().positive().optional(),
   reason: z.enum(['duplicate', 'fraudulent', 'requested_by_customer']).optional(),
-  metadata: z.record(z.string()).optional()
+  metadata: z.record(z.string(), z.string()).optional()
 });
 
 // Response Schemas

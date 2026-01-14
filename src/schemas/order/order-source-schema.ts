@@ -14,7 +14,7 @@ export const OrderSourceSchema = z.enum([
   'import',
   'phone'
 ], {
-  errorMap: () => ({ message: 'Invalid order source' })
+  error: 'Invalid order source'
 });
 
 export type OrderSourceType = z.infer<typeof OrderSourceSchema>;
