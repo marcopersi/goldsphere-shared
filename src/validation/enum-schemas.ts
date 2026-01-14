@@ -414,27 +414,27 @@ export const preWarmEnumCaches = (): void => {
 export const MetalInstanceSchema = z.object({
   symbol: z.string(),
   name: z.string(),
-  toString: z.function().optional()
+  toString: z.any().optional()
 });
 
 export const OrderTypeInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
-  toString: z.function().optional()
+  toString: z.any().optional()
 });
 
 export const OrderStatusInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
   description: z.string(),
-  toString: z.function().optional()
+  toString: z.any().optional()
 });
 
 export const OrderSourceInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
   description: z.string(),
-  toString: z.function().optional()
+  toString: z.any().optional()
 });
 
 // =============================================================================
