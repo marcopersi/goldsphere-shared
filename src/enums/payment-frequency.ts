@@ -7,6 +7,7 @@ export class PaymentFrequency {
   static readonly MONTHLY = new PaymentFrequency('monthly', 'Monthly', 'Charged every month');
   static readonly QUARTERLY = new PaymentFrequency('quarterly', 'Quarterly', 'Charged every quarter');
   static readonly YEARLY = new PaymentFrequency('yearly', 'Yearly', 'Charged annually');
+  static readonly ONETIME = new PaymentFrequency('onetime', 'One Time', 'Charged once');
 
   private constructor(
     public readonly value: string,
@@ -15,7 +16,7 @@ export class PaymentFrequency {
   ) {}
 
   static values(): PaymentFrequency[] {
-    return [this.DAILY, this.WEEKLY, this.MONTHLY, this.QUARTERLY, this.YEARLY];
+    return [this.DAILY, this.WEEKLY, this.MONTHLY, this.QUARTERLY, this.YEARLY, this.ONETIME];
   }
 
   static fromValue(value: string): PaymentFrequency | undefined {
