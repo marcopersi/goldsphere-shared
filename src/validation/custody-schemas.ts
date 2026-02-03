@@ -45,7 +45,7 @@ const getPaymentFrequencyCache = () => {
       _paymentFrequencyCache = new Set(values.map((pf: any) => pf.value.toLowerCase()));
     } catch (error: unknown) {
       console.warn('Failed to load PaymentFrequency enum, using fallback values:', error);
-      _paymentFrequencyCache = new Set(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']);
+      _paymentFrequencyCache = new Set(['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'onetime']);
     }
   }
   return _paymentFrequencyCache;
@@ -89,7 +89,7 @@ export const PaymentFrequencyEnumSchema = z.string().refine(
     return cache.has(normalized);
   },
   {
-    message: "Invalid payment frequency. Must be one of: daily, weekly, monthly, quarterly, yearly"
+    message: "Invalid payment frequency. Must be one of: daily, weekly, monthly, quarterly, yearly, onetime"
   }
 );
 
