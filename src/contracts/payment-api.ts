@@ -4,9 +4,11 @@
 import type { 
   PaymentMethod, 
   PaymentError,
+  CartPaymentIntentRequest,
+  CreateCartPaymentIntentResponse,
   CreatePaymentIntentRequest,
   CreatePaymentIntentResponse,
-  ConfirmPaymentRequest,
+  ConfirmPaymentInput,
   ConfirmPaymentResponse,
   RetrievePaymentIntentResponse,
   ListPaymentMethodsResponse,
@@ -52,10 +54,19 @@ export interface PaymentAPIClient {
   ): Promise<CreatePaymentIntentResponse>;
 
   /**
+   * Create a shared payment intent for multiple payable references
+   */
+  createCartPaymentIntent(
+    request: CartPaymentIntentRequest,
+    options?: RequestOptions
+  ): Promise<CreateCartPaymentIntentResponse>;
+
+  /**
    * Confirm a payment intent
    */
   confirmPayment(
-    request: ConfirmPaymentRequest,
+    paymentIntentId: string,
+    request?: ConfirmPaymentInput,
     options?: RequestOptions
   ): Promise<ConfirmPaymentResponse>;
 
@@ -108,10 +119,18 @@ export interface PaymentService {
   ): Promise<CreatePaymentIntentResponse>;
 
   /**
+   * Create a shared payment intent for multiple payable references
+   */
+  createCartPaymentIntent(
+    request: CartPaymentIntentRequest
+  ): Promise<CreateCartPaymentIntentResponse>;
+
+  /**
    * Confirm a payment intent
    */
   confirmPayment(
-    request: ConfirmPaymentRequest
+    paymentIntentId: string,
+    request?: ConfirmPaymentInput
   ): Promise<ConfirmPaymentResponse>;
 
   /**

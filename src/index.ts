@@ -131,12 +131,15 @@ export {
   
   // Request Schemas
   CreatePaymentIntentRequestSchema,
+  CartPaymentIntentRequestSchema,
+  ConfirmPaymentInputSchema,
   ConfirmPaymentRequestSchema,
   ListPaymentMethodsRequestSchema,
   RefundRequestSchema,
   
   // Response Schemas
   CreatePaymentIntentResponseSchema,
+  CreateCartPaymentIntentResponseSchema,
   ConfirmPaymentResponseSchema,
   ListPaymentMethodsResponseSchema,
   RefundResponseSchema,
@@ -158,6 +161,7 @@ export {
   
   // Validation helpers
   validateCreatePaymentIntent,
+  validateCreateCartPaymentIntent,
   validateConfirmPayment,
   validateListPaymentMethods,
   validateRefundRequest,
@@ -171,15 +175,20 @@ export {
   type PaymentError,
   type PaymentMethod,
   type PaymentIntent,
+  type PaymentIntentData,
+  type CartPaymentIntentData,
   
   // Request Types (what server needs)
   type CreatePaymentIntentRequest,
+  type CartPaymentIntentRequest,
+  type ConfirmPaymentInput,
   type ConfirmPaymentRequest,
   type ListPaymentMethodsRequest,
   type RefundRequest,
   
   // Response Types (what server needs)
   type CreatePaymentIntentResponse,
+  type CreateCartPaymentIntentResponse,
   type ConfirmPaymentResponse,
   type ListPaymentMethodsResponse,
   type RefundResponse,
@@ -193,10 +202,13 @@ export {
   type PaymentMethodInput,
   type PaymentIntentInput,
   type CreatePaymentIntentRequestType,
+  type CartPaymentIntentRequestType,
+  type ConfirmPaymentInputType,
   type ConfirmPaymentRequestType,
   type ListPaymentMethodsRequestType,
   type RefundRequestType,
   type CreatePaymentIntentResponseType,
+  type CreateCartPaymentIntentResponseType,
   type ConfirmPaymentResponseType,
   type ListPaymentMethodsResponseType,
   type RefundResponseType,

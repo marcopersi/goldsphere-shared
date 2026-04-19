@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { CurrencyEnumSchema } from './enum-schemas';
 
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // Enums and Constants
 export const PaymentMethodTypeSchema = z.enum(['card', 'bank_transfer', 'sepa_debit']);
 export const PaymentIntentStatusSchema = z.enum([
@@ -52,7 +54,6 @@ export const PaymentIntentSchema = z.object({
   amount: z.number().int().positive('Amount must be positive'),
   currency: CurrencyEnumSchema,
   status: PaymentIntentStatusSchema,
-  orderId: z.string().optional(),
   customerId: z.string().optional(),
   paymentMethodId: z.string().optional(),
   metadata: z.record(z.string(), z.string()).optional(),
@@ -66,6 +67,24 @@ export const PaymentIntentSchema = z.object({
   refundedAmount: z.number().int().nonnegative().optional()
 });
 
+export const PaymentIntentDataSchema = z.object({
+  paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
+  clientSecret: z.string().min(1, 'Client secret is required'),
+  status: PaymentIntentStatusSchema,
+  amount: z.number().int().positive('Amount must be positive'),
+  currency: CurrencyEnumSchema,
+  referenceId: z.string().regex(uuidPattern, 'Reference ID must be a valid UUID'),
+});
+
+export const CartPaymentIntentDataSchema = z.object({
+  paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
+  clientSecret: z.string().min(1, 'Client secret is required'),
+  status: PaymentIntentStatusSchema,
+  amount: z.number().int().positive('Amount must be positive'),
+  currency: CurrencyEnumSchema,
+  referenceIds: z.array(z.string().regex(uuidPattern, 'Reference ID must be a valid UUID')).min(1),
+});
+
 export const PaymentErrorSchema = z.object({
   code: z.string().min(1, 'Error code is required'),
   message: z.string().min(1, 'Error message is required'),
@@ -76,24 +95,23 @@ export const PaymentErrorSchema = z.object({
 
 // Request Schemas
 export const CreatePaymentIntentRequestSchema = z.object({
-  amount: z.number().int().positive('Amount must be positive'),
+  referenceId: z.string().regex(uuidPattern, 'Reference ID must be a valid UUID'),
   currency: CurrencyEnumSchema,
-  orderId: z.string().min(1, 'Order ID is required'),
-  customerId: z.string().optional(),
-  paymentMethodId: z.string().optional(),
-  automaticPaymentMethods: z.object({
-    enabled: z.boolean(),
-    allowRedirects: z.enum(['always', 'never']).optional()
-  }).optional(),
-  description: z.string().max(1000).optional(),
-  metadata: z.record(z.string(), z.string()).optional()
 });
 
-export const ConfirmPaymentRequestSchema = z.object({
-  paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
+export const CartPaymentIntentRequestSchema = z.object({
+  referenceIds: z.array(z.string().regex(uuidPattern, 'Reference ID must be a valid UUID')).min(1, 'At least one reference ID is required').max(20, 'Maximum 20 references are supported per cart payment'),
+  currency: CurrencyEnumSchema,
+});
+
+export const ConfirmPaymentInputSchema = z.object({
   paymentMethodId: z.string().optional(),
   returnUrl: z.string().url().optional(),
   useStripeSdk: z.boolean().optional()
+});
+
+export const ConfirmPaymentRequestSchema = ConfirmPaymentInputSchema.extend({
+  paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
 });
 
 export const ListPaymentMethodsRequestSchema = z.object({
@@ -111,21 +129,18 @@ export const RefundRequestSchema = z.object({
 
 // Response Schemas
 export const CreatePaymentIntentResponseSchema = z.object({
-  success: z.boolean(),
-  paymentIntent: PaymentIntentSchema.optional(),
-  error: PaymentErrorSchema.optional()
-}).refine(
-  (data) => data.success ? !!data.paymentIntent : !!data.error,
-  {
-    message: 'Response must include paymentIntent on success or error on failure',
-    path: ['success']
-  }
-);
+  success: z.literal(true),
+  data: PaymentIntentDataSchema,
+});
+
+export const CreateCartPaymentIntentResponseSchema = z.object({
+  success: z.literal(true),
+  data: CartPaymentIntentDataSchema,
+});
 
 export const ConfirmPaymentResponseSchema = z.object({
-  success: z.boolean(),
-  paymentIntent: PaymentIntentSchema.optional(),
-  error: PaymentErrorSchema.optional(),
+  success: z.literal(true),
+  paymentIntent: PaymentIntentSchema,
   requiresAction: z.boolean().optional(),
   nextAction: z.object({
     type: z.string(),
@@ -134,14 +149,13 @@ export const ConfirmPaymentResponseSchema = z.object({
 });
 
 export const ListPaymentMethodsResponseSchema = z.object({
-  success: z.boolean(),
-  paymentMethods: z.array(PaymentMethodSchema).optional(),
-  hasMore: z.boolean().optional(),
-  error: PaymentErrorSchema.optional()
+  success: z.literal(true),
+  paymentMethods: z.array(PaymentMethodSchema),
+  hasMore: z.boolean()
 });
 
 export const RefundResponseSchema = z.object({
-  success: z.boolean(),
+  success: z.literal(true),
   refund: z.object({
     id: z.string(),
     amount: z.number().int().nonnegative(),
@@ -149,21 +163,13 @@ export const RefundResponseSchema = z.object({
     status: z.enum(['pending', 'succeeded', 'failed', 'canceled']),
     reason: z.string().optional(),
     createdAt: z.coerce.date()
-  }).optional(),
-  error: PaymentErrorSchema.optional()
+  })
 });
 
 export const RetrievePaymentIntentResponseSchema = z.object({
-  success: z.boolean(),
-  paymentIntent: PaymentIntentSchema.optional(),
-  error: PaymentErrorSchema.optional()
-}).refine(
-  (data) => data.success ? !!data.paymentIntent : !!data.error,
-  {
-    message: 'Response must include paymentIntent on success or error on failure',
-    path: ['success']
-  }
-);
+  success: z.literal(true),
+  data: PaymentIntentDataSchema,
+});
 
 // Webhook Event Schema
 export const PaymentWebhookEventSchema = z.object({
@@ -198,6 +204,10 @@ export const validateCreatePaymentIntent = (data: unknown) => {
   return CreatePaymentIntentRequestSchema.safeParse(data);
 };
 
+export const validateCreateCartPaymentIntent = (data: unknown) => {
+  return CartPaymentIntentRequestSchema.safeParse(data);
+};
+
 export const validateConfirmPayment = (data: unknown) => {
   return ConfirmPaymentRequestSchema.safeParse(data);
 };
@@ -223,10 +233,14 @@ export const PaymentSchemas = {
   // Entities
   PaymentMethod: PaymentMethodSchema,
   PaymentIntent: PaymentIntentSchema,
+  PaymentIntentData: PaymentIntentDataSchema,
+  CartPaymentIntentData: CartPaymentIntentDataSchema,
   PaymentError: PaymentErrorSchema,
   
   // Requests
   CreatePaymentIntentRequest: CreatePaymentIntentRequestSchema,
+  CartPaymentIntentRequest: CartPaymentIntentRequestSchema,
+  ConfirmPaymentInput: ConfirmPaymentInputSchema,
   ConfirmPaymentRequest: ConfirmPaymentRequestSchema,
   ListPaymentMethodsRequest: ListPaymentMethodsRequestSchema,
   RefundRequest: RefundRequestSchema,
@@ -237,6 +251,7 @@ export const PaymentSchemas = {
   
   // Responses
   CreatePaymentIntentResponse: CreatePaymentIntentResponseSchema,
+  CreateCartPaymentIntentResponse: CreateCartPaymentIntentResponseSchema,
   ConfirmPaymentResponse: ConfirmPaymentResponseSchema,
   ListPaymentMethodsResponse: ListPaymentMethodsResponseSchema,
   RefundResponse: RefundResponseSchema,
@@ -254,6 +269,8 @@ export const PaymentSchemas = {
 export type PaymentMethodInput = z.infer<typeof PaymentMethodSchema>;
 export type PaymentIntentInput = z.infer<typeof PaymentIntentSchema>;
 export type PaymentErrorType = z.infer<typeof PaymentErrorSchema>;
+export type PaymentIntentData = z.infer<typeof PaymentIntentDataSchema>;
+export type CartPaymentIntentData = z.infer<typeof CartPaymentIntentDataSchema>;
 
 // Server-expected type names (without "Type" suffix)
 export type PaymentError = z.infer<typeof PaymentErrorSchema>;
@@ -262,18 +279,23 @@ export type PaymentIntent = z.infer<typeof PaymentIntentSchema>;
 
 // Request types
 export type CreatePaymentIntentRequestType = z.infer<typeof CreatePaymentIntentRequestSchema>;
+export type CartPaymentIntentRequestType = z.infer<typeof CartPaymentIntentRequestSchema>;
+export type ConfirmPaymentInputType = z.infer<typeof ConfirmPaymentInputSchema>;
 export type ConfirmPaymentRequestType = z.infer<typeof ConfirmPaymentRequestSchema>;
 export type ListPaymentMethodsRequestType = z.infer<typeof ListPaymentMethodsRequestSchema>;
 export type RefundRequestType = z.infer<typeof RefundRequestSchema>;
 
 // Server-expected request type names (without "Type" suffix)
 export type CreatePaymentIntentRequest = z.infer<typeof CreatePaymentIntentRequestSchema>;
+export type CartPaymentIntentRequest = z.infer<typeof CartPaymentIntentRequestSchema>;
+export type ConfirmPaymentInput = z.infer<typeof ConfirmPaymentInputSchema>;
 export type ConfirmPaymentRequest = z.infer<typeof ConfirmPaymentRequestSchema>;
 export type ListPaymentMethodsRequest = z.infer<typeof ListPaymentMethodsRequestSchema>;
 export type RefundRequest = z.infer<typeof RefundRequestSchema>;
 
 // Response types  
 export type CreatePaymentIntentResponseType = z.infer<typeof CreatePaymentIntentResponseSchema>;
+export type CreateCartPaymentIntentResponseType = z.infer<typeof CreateCartPaymentIntentResponseSchema>;
 export type ConfirmPaymentResponseType = z.infer<typeof ConfirmPaymentResponseSchema>;
 export type ListPaymentMethodsResponseType = z.infer<typeof ListPaymentMethodsResponseSchema>;
 export type RefundResponseType = z.infer<typeof RefundResponseSchema>;
@@ -281,6 +303,7 @@ export type RetrievePaymentIntentResponseType = z.infer<typeof RetrievePaymentIn
 
 // Server-expected response type names (without "Type" suffix)
 export type CreatePaymentIntentResponse = z.infer<typeof CreatePaymentIntentResponseSchema>;
+export type CreateCartPaymentIntentResponse = z.infer<typeof CreateCartPaymentIntentResponseSchema>;
 export type ConfirmPaymentResponse = z.infer<typeof ConfirmPaymentResponseSchema>;
 export type ListPaymentMethodsResponse = z.infer<typeof ListPaymentMethodsResponseSchema>;
 export type RefundResponse = z.infer<typeof RefundResponseSchema>;

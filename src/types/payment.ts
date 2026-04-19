@@ -45,7 +45,6 @@ export interface PaymentIntent extends Timestamps {
   amount: number; // in cents
   currency: Currency;
   status: PaymentIntentStatus;
-  orderId?: string;
   customerId?: string;
   paymentMethodId?: string;
   metadata?: Record<string, string>;
@@ -66,36 +65,56 @@ export interface PaymentError {
 
 // Request/Response Types
 export interface CreatePaymentIntentRequest {
-  amount: number; // in cents
+  referenceId: string;
   currency: Currency;
-  orderId: string;
-  customerId?: string;
-  paymentMethodId?: string;
-  automaticPaymentMethods?: {
-    enabled: boolean;
-    allowRedirects?: 'always' | 'never';
-  };
-  description?: string;
-  metadata?: Record<string, string>;
+}
+
+export interface CartPaymentIntentRequest {
+  referenceIds: string[];
+  currency: Currency;
+}
+
+export interface PaymentIntentData {
+  paymentIntentId: string;
+  clientSecret: string;
+  status: PaymentIntentStatus;
+  amount: number;
+  currency: Currency;
+  referenceId: string;
+}
+
+export interface CartPaymentIntentData {
+  paymentIntentId: string;
+  clientSecret: string;
+  status: PaymentIntentStatus;
+  amount: number;
+  currency: Currency;
+  referenceIds: string[];
 }
 
 export interface CreatePaymentIntentResponse {
-  success: boolean;
-  paymentIntent?: PaymentIntent;
-  error?: PaymentError;
+  success: true;
+  data: PaymentIntentData;
 }
 
-export interface ConfirmPaymentRequest {
-  paymentIntentId: string;
+export interface CreateCartPaymentIntentResponse {
+  success: true;
+  data: CartPaymentIntentData;
+}
+
+export interface ConfirmPaymentInput {
   paymentMethodId?: string;
   returnUrl?: string;
   useStripeSdk?: boolean;
 }
 
+export interface ConfirmPaymentRequest extends ConfirmPaymentInput {
+  paymentIntentId: string;
+}
+
 export interface ConfirmPaymentResponse {
-  success: boolean;
-  paymentIntent?: PaymentIntent;
-  error?: PaymentError;
+  success: true;
+  paymentIntent: PaymentIntent;
   requiresAction?: boolean;
   nextAction?: {
     type: string;
@@ -104,9 +123,8 @@ export interface ConfirmPaymentResponse {
 }
 
 export interface RetrievePaymentIntentResponse {
-  success: boolean;
-  paymentIntent?: PaymentIntent;
-  error?: PaymentError;
+  success: true;
+  data: PaymentIntentData;
 }
 
 export interface ListPaymentMethodsRequest {
@@ -116,10 +134,9 @@ export interface ListPaymentMethodsRequest {
 }
 
 export interface ListPaymentMethodsResponse {
-  success: boolean;
-  paymentMethods?: PaymentMethod[];
-  hasMore?: boolean;
-  error?: PaymentError;
+  success: true;
+  paymentMethods: PaymentMethod[];
+  hasMore: boolean;
 }
 
 export interface RefundRequest {
@@ -130,8 +147,8 @@ export interface RefundRequest {
 }
 
 export interface RefundResponse {
-  success: boolean;
-  refund?: {
+  success: true;
+  refund: {
     id: string;
     amount: number;
     currency: Currency;
@@ -139,13 +156,13 @@ export interface RefundResponse {
     reason?: string;
     createdAt: Date;
   };
-  error?: PaymentError;
 }
 
 // Provider Interface (for implementation)
 export interface PaymentProviderImplementation {
   name: string;
   createPaymentIntent(request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse>;
+  createCartPaymentIntent?(request: CartPaymentIntentRequest): Promise<CreateCartPaymentIntentResponse>;
   confirmPayment(request: ConfirmPaymentRequest): Promise<ConfirmPaymentResponse>;
   retrievePaymentIntent(paymentIntentId: string): Promise<RetrievePaymentIntentResponse>;
   getPaymentMethods(request: ListPaymentMethodsRequest): Promise<ListPaymentMethodsResponse>;
