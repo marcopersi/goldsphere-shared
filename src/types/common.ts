@@ -87,7 +87,7 @@ export interface CursorPaginatedResponse<T> {
 /**
  * Success response wrapper
  */
-export interface ApiSuccess<T = any> {
+export interface ApiSuccess<T = unknown> {
   success: true;
   data?: T;
   message?: string;
@@ -116,7 +116,7 @@ export interface ApiError {
 /**
  * Generic API response type
  */
-export type ApiResponse<T = any> = ApiSuccess<T> | ApiError;
+export type ApiResponse<T = unknown> = ApiSuccess<T> | ApiError;
 
 // =====================================
 // HTTP CLIENT TYPES

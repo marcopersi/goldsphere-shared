@@ -7,6 +7,31 @@
 
 import { z } from 'zod';
 
+interface EnumWithValues<TValue> {
+  values(): TValue[];
+}
+
+interface CustodianEnumValue {
+  value: string;
+  name: string;
+}
+
+interface PaymentFrequencyEnumValue {
+  value: string;
+}
+
+interface CustodyServiceTypeEnumValue {
+  value: string;
+}
+
+interface EnumModule {
+  Custodian: EnumWithValues<CustodianEnumValue>;
+  PaymentFrequency: EnumWithValues<PaymentFrequencyEnumValue>;
+  CustodyServiceType: EnumWithValues<CustodyServiceTypeEnumValue>;
+}
+
+const loadEnums = (): EnumModule => require('../enums') as EnumModule;
+
 // =============================================================================
 // PERFORMANCE-OPTIMIZED ENUM CACHING
 // =============================================================================
@@ -20,14 +45,13 @@ let _custodyServiceTypeCache: Set<string> | null = null;
 const getCustodianCache = () => {
   if (!_custodianCache) {
     try {
-      const { Custodian } = require('../enums');
+      const { Custodian } = loadEnums();
       const values = Custodian.values();
       _custodianCache = {
-        values: new Set(values.map((c: any) => c.value.toLowerCase())),
-        names: new Set(values.map((c: any) => c.name.toLowerCase()))
+        values: new Set(values.map((c) => c.value.toLowerCase())),
+        names: new Set(values.map((c) => c.name.toLowerCase()))
       };
-    } catch (error: unknown) {
-      console.warn('Failed to load Custodian enum, using fallback values:', error);
+    } catch {
       _custodianCache = {
         values: new Set(['brinks', 'loomis', 'malca-amit', 'via-mat']),
         names: new Set(['brinks', 'loomis', 'malca-amit', 'via mat international'])
@@ -40,11 +64,10 @@ const getCustodianCache = () => {
 const getPaymentFrequencyCache = () => {
   if (!_paymentFrequencyCache) {
     try {
-      const { PaymentFrequency } = require('../enums');
+      const { PaymentFrequency } = loadEnums();
       const values = PaymentFrequency.values();
-      _paymentFrequencyCache = new Set(values.map((pf: any) => pf.value.toLowerCase()));
-    } catch (error: unknown) {
-      console.warn('Failed to load PaymentFrequency enum, using fallback values:', error);
+      _paymentFrequencyCache = new Set(values.map((pf) => pf.value.toLowerCase()));
+    } catch {
       _paymentFrequencyCache = new Set(['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'onetime']);
     }
   }
@@ -54,11 +77,10 @@ const getPaymentFrequencyCache = () => {
 const getCustodyServiceTypeCache = () => {
   if (!_custodyServiceTypeCache) {
     try {
-      const { CustodyServiceType } = require('../enums');
+      const { CustodyServiceType } = loadEnums();
       const values = CustodyServiceType.values();
-      _custodyServiceTypeCache = new Set(values.map((cst: any) => cst.value.toLowerCase()));
-    } catch (error: unknown) {
-      console.warn('Failed to load CustodyServiceType enum, using fallback values:', error);
+      _custodyServiceTypeCache = new Set(values.map((cst) => cst.value.toLowerCase()));
+    } catch {
       _custodyServiceTypeCache = new Set(['segregated-storage', 'allocated-storage', 'pooled-storage', 'vault-storage']);
     }
   }
@@ -306,42 +328,39 @@ export const CustodyErrorResponseSchema = z.object({
 // =============================================================================
 
 // Optimized lookup functions with caching
-export const getCustodianByValue = (value: string): any => {
+export const getCustodianByValue = (value: string): CustodianEnumValue | undefined => {
   try {
-    const { Custodian } = require('../enums');
+    const { Custodian } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return Custodian.values().find((custodian: any) => 
+    return Custodian.values().find((custodian) => 
       custodian.value.toLowerCase() === normalized || 
       custodian.name.toLowerCase() === normalized
     );
-  } catch (error: unknown) {
-    console.warn('Failed to load Custodian enum for lookup:', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getPaymentFrequencyByValue = (value: string): any => {
+export const getPaymentFrequencyByValue = (value: string): PaymentFrequencyEnumValue | undefined => {
   try {
-    const { PaymentFrequency } = require('../enums');
+    const { PaymentFrequency } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return PaymentFrequency.values().find((frequency: any) => 
+    return PaymentFrequency.values().find((frequency) => 
       frequency.value.toLowerCase() === normalized
     );
-  } catch (error: unknown) {
-    console.warn('Failed to load PaymentFrequency enum for lookup:', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getCustodyServiceTypeByValue = (value: string): any => {
+export const getCustodyServiceTypeByValue = (value: string): CustodyServiceTypeEnumValue | undefined => {
   try {
-    const { CustodyServiceType } = require('../enums');
+    const { CustodyServiceType } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return CustodyServiceType.values().find((type: any) => 
+    return CustodyServiceType.values().find((type) => 
       type.value.toLowerCase() === normalized
     );
-  } catch (error: unknown) {
-    console.warn('Failed to load CustodyServiceType enum for lookup:', error);
+  } catch {
     return undefined;
   }
 };
@@ -351,7 +370,7 @@ export const getCustodyServiceTypeByValue = (value: string): any => {
 // =============================================================================
 
 // Transform database row to custodian object
-export const mapDatabaseRowToCustodian = (row: any) => {
+export const mapDatabaseRowToCustodian = (row: unknown) => {
   const validated = CustodianDatabaseRowSchema.parse(row);
   return {
     id: validated.id,
@@ -362,7 +381,7 @@ export const mapDatabaseRowToCustodian = (row: any) => {
 };
 
 // Transform database row to custody service object
-export const mapDatabaseRowToCustodyService = (row: any) => {
+export const mapDatabaseRowToCustodyService = (row: unknown) => {
   const validated = CustodyServiceDatabaseRowSchema.parse(row);
   return {
     id: validated.id,
@@ -394,22 +413,25 @@ export const preWarmCustodyCaches = (): void => {
   getCustodianCache();
   getPaymentFrequencyCache();
   getCustodyServiceTypeCache();
-  console.log('Custody enum caches pre-warmed successfully');
 };
 
 // =============================================================================
 // ENUM EXPORTS (with error handling)
 // =============================================================================
 
-let custodianEnum: any, paymentFrequencyEnum: any, custodyServiceTypeEnum: any;
+let custodianEnum: EnumModule['Custodian'] | undefined;
+let paymentFrequencyEnum: EnumModule['PaymentFrequency'] | undefined;
+let custodyServiceTypeEnum: EnumModule['CustodyServiceType'] | undefined;
 
 try {
-  const enums = require('../enums');
+  const enums = loadEnums();
   custodianEnum = enums.Custodian;
   paymentFrequencyEnum = enums.PaymentFrequency;
   custodyServiceTypeEnum = enums.CustodyServiceType;
-} catch (error: unknown) {
-  console.warn('Failed to load custody enum classes, using fallback validation:', error);
+} catch {
+  custodianEnum = undefined;
+  paymentFrequencyEnum = undefined;
+  custodyServiceTypeEnum = undefined;
 }
 
 export const Custodian = custodianEnum;

@@ -16,6 +16,7 @@ export * from './contracts/payment-api';
 export * from './contracts/reference-data-api';
 export * from './contracts/custody-api';
 export * from './contracts/orders-api';
+export * from './contracts/advisory-api';
 
 // =============================================================================
 // CORE TYPES - Export everything from all type modules

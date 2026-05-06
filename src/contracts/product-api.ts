@@ -113,15 +113,15 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export interface RequestConfig {
   method: HttpMethod;
   url: string;
-  data?: any;
-  params?: Record<string, any>;
+  data?: unknown;
+  params?: Record<string, unknown>;
   headers?: Record<string, string>;
   timeout?: number;
   files?: Record<string, File>;
 }
 
 // Response type from HTTP client
-export interface HttpResponse<T = any> {
+export interface HttpResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -154,7 +154,7 @@ export interface MultipartFormData {
  */
 
 // Express request with typed body and params
-export interface TypedRequest<TBody = any, TParams = any, TQuery = any> {
+export interface TypedRequest<TBody = unknown, TParams = unknown, TQuery = unknown> {
   body: TBody;
   params: TParams;
   query: TQuery;
@@ -164,7 +164,7 @@ export interface TypedRequest<TBody = any, TParams = any, TQuery = any> {
 }
 
 // Express response helpers
-export interface TypedResponse<TData = any> {
+export interface TypedResponse<TData = unknown> {
   status(code: number): TypedResponse<TData>;
   json(data: TData): void;
 }

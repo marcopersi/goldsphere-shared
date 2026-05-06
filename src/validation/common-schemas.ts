@@ -122,7 +122,7 @@ const CommonValidationErrorResponseSchema = z.object({
   validationErrors: z.array(z.object({
     field: z.string(),
     message: z.string(),
-    value: z.any().optional(),
+    value: z.unknown().optional(),
     code: z.string().optional()
   })),
   timestamp: TimestampSchema
@@ -251,8 +251,7 @@ const parseQueryParams = <T extends z.ZodTypeAny>(
 ): z.infer<T> | null => {
   try {
     return schema.parse(params);
-  } catch (error) {
-    console.warn('Query parameter validation failed:', error);
+  } catch {
     return null;
   }
 };
