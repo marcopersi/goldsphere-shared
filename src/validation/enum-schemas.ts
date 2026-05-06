@@ -7,6 +7,48 @@
 
 import { z } from 'zod';
 
+interface EnumWithValues<TValue> {
+  values(): TValue[];
+}
+
+interface MetalEnumValue {
+  symbol: string;
+  name: string;
+}
+
+interface ProductTypeEnumValue {
+  name: string;
+}
+
+interface CountryEnumValue {
+  code: string;
+  isoCode2: string;
+  name: string;
+}
+
+interface CurrencyEnumValue {
+  countryCode: string;
+  isoCode3: string;
+  isoNumericCode: number | string;
+}
+
+interface ValueEnum {
+  value: string;
+}
+
+interface EnumModule {
+  Metal: EnumWithValues<MetalEnumValue>;
+  ProductType: EnumWithValues<ProductTypeEnumValue>;
+  Country: EnumWithValues<CountryEnumValue>;
+  Currency: EnumWithValues<CurrencyEnumValue>;
+  Producer?: unknown;
+  OrderType: EnumWithValues<ValueEnum>;
+  OrderStatus: EnumWithValues<ValueEnum>;
+  OrderSource: EnumWithValues<ValueEnum>;
+}
+
+const loadEnums = (): EnumModule => require('../enums') as EnumModule;
+
 // =============================================================================
 // PERFORMANCE-OPTIMIZED ENUM VALIDATION
 // =============================================================================
@@ -24,14 +66,13 @@ let _orderSourceCache: Set<string> | null = null;
 const getMetalCache = () => {
   if (!_metalCache) {
     try {
-      const { Metal } = require('../enums');
+      const { Metal } = loadEnums();
       const values = Metal.values();
       _metalCache = {
-        symbols: new Set(values.map((m: any) => m.symbol.toLowerCase())),
-        names: new Set(values.map((m: any) => m.name.toLowerCase()))
+        symbols: new Set(values.map((m) => m.symbol.toLowerCase())),
+        names: new Set(values.map((m) => m.name.toLowerCase()))
       };
-    } catch (error) {
-      console.warn('Failed to load Metal enum, falling back to hardcoded values', error);
+    } catch {
       _metalCache = {
         symbols: new Set(['au', 'ag', 'pt', 'pd']),
         names: new Set(['gold', 'silver', 'platinum', 'palladium'])
@@ -44,11 +85,10 @@ const getMetalCache = () => {
 const getProductTypeCache = () => {
   if (!_productTypeCache) {
     try {
-      const { ProductType } = require('../enums');
+      const { ProductType } = loadEnums();
       const values = ProductType.values();
-      _productTypeCache = new Set(values.map((pt: any) => pt.name.toLowerCase()));
-    } catch (error) {
-      console.warn('Failed to load ProductType enum, falling back to hardcoded values', error);
+      _productTypeCache = new Set(values.map((pt) => pt.name.toLowerCase()));
+    } catch {
       _productTypeCache = new Set(['coin', 'bar', 'cast bar', 'minted bar', 'combibar', 'medallion', 'jewelry']);
     }
   }
@@ -58,15 +98,14 @@ const getProductTypeCache = () => {
 const getCountryCache = () => {
   if (!_countryCache) {
     try {
-      const { Country } = require('../enums');
+      const { Country } = loadEnums();
       const values = Country.values();
       _countryCache = {
-        codes: new Set(values.map((c: any) => c.code.toLowerCase())),
-        isoCodes: new Set(values.map((c: any) => c.isoCode2.toLowerCase())),
-        names: new Set(values.map((c: any) => c.name.toLowerCase()))
+        codes: new Set(values.map((c) => c.code.toLowerCase())),
+        isoCodes: new Set(values.map((c) => c.isoCode2.toLowerCase())),
+        names: new Set(values.map((c) => c.name.toLowerCase()))
       };
-    } catch (error) {
-      console.warn('Failed to load Country enum, falling back to hardcoded values', error);
+    } catch {
       _countryCache = {
         codes: new Set(['us', 'ca', 'gb', 'de', 'fr', 'au', 'ch']),
         isoCodes: new Set(['us', 'ca', 'gb', 'de', 'fr', 'au', 'ch']),
@@ -80,15 +119,14 @@ const getCountryCache = () => {
 const getCurrencyCache = () => {
   if (!_currencyCache) {
     try {
-      const { Currency } = require('../enums');
+      const { Currency } = loadEnums();
       const values = Currency.values();
       _currencyCache = {
-        countryCodes: new Set(values.map((c: any) => c.countryCode.toLowerCase())),
-        isoCodes: new Set(values.map((c: any) => c.isoCode3.toLowerCase())),
-        numericCodes: new Set(values.map((c: any) => c.isoNumericCode.toString()))
+        countryCodes: new Set(values.map((c) => c.countryCode.toLowerCase())),
+        isoCodes: new Set(values.map((c) => c.isoCode3.toLowerCase())),
+        numericCodes: new Set(values.map((c) => c.isoNumericCode.toString()))
       };
-    } catch (error) {
-      console.warn('Failed to load Currency enum, falling back to hardcoded values', error);
+    } catch {
       _currencyCache = {
         countryCodes: new Set(['us', 'eu', 'gb', 'ch', 'ca', 'au']),
         isoCodes: new Set(['usd', 'eur', 'gbp', 'chf', 'cad', 'aud']),
@@ -102,11 +140,10 @@ const getCurrencyCache = () => {
 const getOrderTypeCache = () => {
   if (!_orderTypeCache) {
     try {
-      const { OrderType } = require('../enums');
+      const { OrderType } = loadEnums();
       const values = OrderType.values();
-      _orderTypeCache = new Set(values.map((ot: any) => ot.value.toLowerCase()));
-    } catch (error) {
-      console.warn('Failed to load OrderType enum, falling back to hardcoded values', error);
+      _orderTypeCache = new Set(values.map((ot) => ot.value.toLowerCase()));
+    } catch {
       _orderTypeCache = new Set(['buy', 'sell']);
     }
   }
@@ -116,11 +153,10 @@ const getOrderTypeCache = () => {
 const getOrderStatusCache = () => {
   if (!_orderStatusCache) {
     try {
-      const { OrderStatus } = require('../enums');
+      const { OrderStatus } = loadEnums();
       const values = OrderStatus.values();
-      _orderStatusCache = new Set(values.map((os: any) => os.value.toLowerCase()));
-    } catch (error) {
-      console.warn('Failed to load OrderStatus enum, falling back to hardcoded values', error);
+      _orderStatusCache = new Set(values.map((os) => os.value.toLowerCase()));
+    } catch {
       _orderStatusCache = new Set(['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
     }
   }
@@ -130,11 +166,10 @@ const getOrderStatusCache = () => {
 const getOrderSourceCache = () => {
   if (!_orderSourceCache) {
     try {
-      const { OrderSource } = require('../enums');
+      const { OrderSource } = loadEnums();
       const values = OrderSource.values();
-      _orderSourceCache = new Set(values.map((os: any) => os.value.toLowerCase()));
-    } catch (error) {
-      console.warn('Failed to load OrderSource enum, falling back to hardcoded values', error);
+      _orderSourceCache = new Set(values.map((os) => os.value.toLowerCase()));
+    } catch {
       _orderSourceCache = new Set(['web', 'mobile', 'api', 'admin', 'import', 'phone']);
     }
   }
@@ -237,98 +272,91 @@ export const OrderSourceEnumSchema = z.string().refine(
 // =============================================================================
 
 // High-performance lookup functions with caching
-export const getMetalByValue = (value: string): any => {
+export const getMetalByValue = (value: string): MetalEnumValue | undefined => {
   try {
-    const { Metal } = require('../enums');
+    const { Metal } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return Metal.values().find((metal: any) => 
+    return Metal.values().find((metal) => 
       metal.symbol.toLowerCase() === normalized || 
       metal.name.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load Metal enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getProductTypeByValue = (value: string): any => {
+export const getProductTypeByValue = (value: string): ProductTypeEnumValue | undefined => {
   try {
-    const { ProductType } = require('../enums');
+    const { ProductType } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return ProductType.values().find((type: any) => 
+    return ProductType.values().find((type) => 
       type.name.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load ProductType enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getCountryByValue = (value: string): any => {
+export const getCountryByValue = (value: string): CountryEnumValue | undefined => {
   try {
-    const { Country } = require('../enums');
+    const { Country } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return Country.values().find((country: any) => 
+    return Country.values().find((country) => 
       country.isoCode2.toLowerCase() === normalized || 
       country.code.toLowerCase() === normalized ||
       country.name.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load Country enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getCurrencyByValue = (value: string): any => {
+export const getCurrencyByValue = (value: string): CurrencyEnumValue | undefined => {
   try {
-    const { Currency } = require('../enums');
+    const { Currency } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return Currency.values().find((currency: any) => 
+    return Currency.values().find((currency) => 
       currency.countryCode.toLowerCase() === normalized || 
       currency.isoCode3.toLowerCase() === normalized ||
       currency.isoNumericCode.toString() === value.trim()
     );
-  } catch (error) {
-    console.warn('Failed to load Currency enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getOrderTypeByValue = (value: string): any => {
+export const getOrderTypeByValue = (value: string): ValueEnum | undefined => {
   try {
-    const { OrderType } = require('../enums');
+    const { OrderType } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return OrderType.values().find((orderType: any) => 
+    return OrderType.values().find((orderType) => 
       orderType.value.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load OrderType enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getOrderStatusByValue = (value: string): any => {
+export const getOrderStatusByValue = (value: string): ValueEnum | undefined => {
   try {
-    const { OrderStatus } = require('../enums');
+    const { OrderStatus } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return OrderStatus.values().find((orderStatus: any) => 
+    return OrderStatus.values().find((orderStatus) => 
       orderStatus.value.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load OrderStatus enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
 
-export const getOrderSourceByValue = (value: string): any => {
+export const getOrderSourceByValue = (value: string): ValueEnum | undefined => {
   try {
-    const { OrderSource } = require('../enums');
+    const { OrderSource } = loadEnums();
     const normalized = value.toLowerCase().trim();
-    return OrderSource.values().find((orderSource: any) => 
+    return OrderSource.values().find((orderSource) => 
       orderSource.value.toLowerCase() === normalized
     );
-  } catch (error) {
-    console.warn('Failed to load OrderSource enum for lookup', error);
+  } catch {
     return undefined;
   }
 };
@@ -414,27 +442,27 @@ export const preWarmEnumCaches = (): void => {
 export const MetalInstanceSchema = z.object({
   symbol: z.string(),
   name: z.string(),
-  toString: z.any().optional()
+  toString: z.unknown().optional()
 });
 
 export const OrderTypeInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
-  toString: z.any().optional()
+  toString: z.unknown().optional()
 });
 
 export const OrderStatusInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
   description: z.string(),
-  toString: z.any().optional()
+  toString: z.unknown().optional()
 });
 
 export const OrderSourceInstanceSchema = z.object({
   value: z.string(),
   displayName: z.string(),
   description: z.string(),
-  toString: z.any().optional()
+  toString: z.unknown().optional()
 });
 
 // =============================================================================
@@ -444,80 +472,72 @@ export const OrderSourceInstanceSchema = z.object({
 // Safe exports with fallbacks using IIFEs to keep bindings const
 export const Metal = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.Metal;
-  } catch (error) {
-    console.warn('Failed to load enum classes (Metal)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const ProductType = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.ProductType;
-  } catch (error) {
-    console.warn('Failed to load enum classes (ProductType)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const Country = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.Country;
-  } catch (error) {
-    console.warn('Failed to load enum classes (Country)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const Currency = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.Currency;
-  } catch (error) {
-    console.warn('Failed to load enum classes (Currency)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const Producer = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.Producer;
-  } catch (error) {
-    console.warn('Failed to load enum classes (Producer)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const OrderType = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.OrderType;
-  } catch (error) {
-    console.warn('Failed to load enum classes (OrderType)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const OrderStatus = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.OrderStatus;
-  } catch (error) {
-    console.warn('Failed to load enum classes (OrderStatus)', error);
+  } catch {
     return undefined;
   }
 })();
 
 export const OrderSource = (() => {
   try {
-    const enums = require('../enums');
+    const enums = loadEnums();
     return enums.OrderSource;
-  } catch (error) {
-    console.warn('Failed to load enum classes (OrderSource)', error);
+  } catch {
     return undefined;
   }
 })();

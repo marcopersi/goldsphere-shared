@@ -10,3 +10,4 @@ export * from './payment-api';
 export * from './reference-data-api';
 export * from './custody-api';
 export * from './orders-api';
+export * from './advisory-api';
