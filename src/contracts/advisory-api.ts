@@ -198,19 +198,17 @@ export interface ReplaceProductAdvisoryTagsRequest {
   }>;
 }
 
-export interface CreateAdvisoryWorkflowDraftRequest {
-  workflowKey: string;
+export interface AdvisoryWorkflowDraftUpsertRequest {
   displayName: string;
   description?: string | null;
   definition: AdvisoryWorkflowDefinitionDto;
 }
 
-export interface UpdateAdvisoryWorkflowDraftRequest {
+export interface CreateAdvisoryWorkflowDraftRequest extends AdvisoryWorkflowDraftUpsertRequest {
   workflowKey: string;
-  displayName: string;
-  description?: string | null;
-  definition: AdvisoryWorkflowDefinitionDto;
 }
+
+export type UpdateAdvisoryWorkflowDraftRequest = AdvisoryWorkflowDraftUpsertRequest;
 
 export interface AdvisoryApiClient extends AdvisoryBaseApiClient {
   getActiveWorkflow(workflowKey?: string): Promise<ApiResponse<AdvisoryWorkflowVersionDto>>;
