@@ -205,6 +205,13 @@ export interface CreateAdvisoryWorkflowDraftRequest {
   definition: AdvisoryWorkflowDefinitionDto;
 }
 
+export interface UpdateAdvisoryWorkflowDraftRequest {
+  workflowKey: string;
+  displayName: string;
+  description?: string | null;
+  definition: AdvisoryWorkflowDefinitionDto;
+}
+
 export interface AdvisoryApiClient extends AdvisoryBaseApiClient {
   getActiveWorkflow(workflowKey?: string): Promise<ApiResponse<AdvisoryWorkflowVersionDto>>;
   startSession(request?: StartAdvisorySessionRequest): Promise<ApiResponse<AdvisorySessionDto>>;
@@ -218,6 +225,7 @@ export interface AdvisoryApiClient extends AdvisoryBaseApiClient {
   replaceProductTags(productId: string, request: ReplaceProductAdvisoryTagsRequest): Promise<ApiResponse<ProductAdvisoryTagDto[]>>;
   listWorkflows(): Promise<ApiResponse<AdvisoryWorkflowSummaryDto[]>>;
   createWorkflowDraft(request: CreateAdvisoryWorkflowDraftRequest): Promise<ApiResponse<AdvisoryWorkflowVersionDto>>;
+  updateWorkflowDraft(workflowVersionId: string, request: UpdateAdvisoryWorkflowDraftRequest): Promise<ApiResponse<AdvisoryWorkflowVersionDto>>;
   getWorkflowCoverage(workflowVersionId: string): Promise<ApiResponse<AdvisoryCoverageResultDto[]>>;
   publishWorkflow(workflowVersionId: string): Promise<ApiResponse<{
     version: AdvisoryWorkflowVersionDto;
