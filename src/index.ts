@@ -391,6 +391,17 @@ export {
 } from './config/payment-config';
 
 // =============================================================================
+// MONEY HELPERS - Stripe amount conversion
+// =============================================================================
+export {
+  STRIPE_ZERO_DECIMAL_CURRENCIES,
+  STRIPE_THREE_DECIMAL_CURRENCIES,
+  getStripeCurrencyDecimals,
+  toStripeMinorUnits,
+  fromStripeMinorUnits,
+} from './money/stripeAmount';
+
+// =============================================================================
 // UTILITY RE-EXPORTS - Common dependencies
 // =============================================================================
 export { z } from 'zod';
